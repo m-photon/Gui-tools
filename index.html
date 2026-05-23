@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>imgui tools</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            margin: 0;
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .widget-bar {
+            background-color: #1a1a1a; 
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #333333;
+        }
+
+        .widget {
+            background-color: #333333;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .widget:hover {
+            background-color: #444444;
+        }
+
+        .content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .frame {
+            background-color: #0f0f0f;
+            border: 1px solid #222222;
+            border-radius: 8px;
+            width: 70%;
+            max-width: 600px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            max-width: 180px;
+            height: auto;
+            margin-bottom: -10px;
+        }
+
+        h1 {
+            margin: 0 0 15px 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+
+        .rect-btn {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 1px solid #444444;
+            padding: 12px 40px;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            width: 250px;
+            border-radius: 3px;
+        }
+
+        .rect-btn:hover {
+            background-color: #444444;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="widget-bar">
+        <div class="widget">Menu</div>
+        <div class="widget">Search</div>
+        <div class="widget">Profile</div>
+    </div>
+
+    <div class="content">
+        <div class="frame">
+            <img src="logo.png" alt="GUI Logo" class="logo">
+            <h1>imgui tools</h1>
+            <button class="rect-btn">Button 1</button>
+            <button class="rect-btn">Button 2</button>
+            <button class="rect-btn">Button 3</button>
+        </div>
+    </div>
+
+</body>
+</html>
