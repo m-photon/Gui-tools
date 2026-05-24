@@ -1,374 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>imgui tools</title>
-    <style>
-        body {
-            background-color: #000000;
-            color: #ffffff;
-            margin: 0;
-            font-family: "Comic Sans MS", "Comic Sans", cursive;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden; 
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>imgui tools</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      margin: 0;
+      font-family: "Comic Sans MS", "Comic Sans", cursive;
+      display: flex;
+      flex-flow: column nowrap;
+      height: 100vh;
+      overflow: hidden; 
+    }
 
-        #particles-js {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 0;
-        }
+    #particles-js {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
 
-        .widget-bar {
-            background-color: #1a1a1a; 
-            width: 100%;
-            min-height: 60px;
-            border-bottom: 2px solid #333333;
-            position: relative;
-            z-index: 3;
-        }
+    .top-nav {
+      background: #1a1a1a; 
+      width: 100%;
+      min-height: 60px;
+      border-bottom: 2px solid #333;
+      position: relative;
+      z-index: 3;
+    }
 
-        .content {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-            position: relative;
-            z-index: 1;
-        }
+    .main-wrap {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+      position: relative;
+      z-index: 1;
+    }
 
-        .bg-triangle {
-            position: absolute;
-            width: 750px;
-            height: 750px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1; 
-            pointer-events: none; 
-            animation: spin 15s linear infinite;
-        }
+    .hero-shape {
+      position: absolute;
+      width: 750px;
+      height: 750px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1; 
+      pointer-events: none; 
+      animation: spin 15s linear infinite;
+    }
 
-        @keyframes spin {
-          0% { transform: translate(-50%, -50%) rotate(0deg); }
-          100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
 
-        .frame {
-            background-color: rgba(17, 17, 17, 0.75);
-            border: 1px solid #222222;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 500px;
-            padding: 50px 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            box-sizing: border-box;
-            backdrop-filter: blur(6px); 
-            z-index: 2; 
-        }
+    .menu-box {
+      background: rgba(17, 17, 17, 0.75);
+      border: 1px solid #222;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 500px;
+      padding: 50px 40px;
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: center;
+      gap: 15px;
+      box-sizing: border-box;
+      backdrop-filter: blur(6px); 
+      z-index: 2; 
+    }
 
-        .logo {
-            max-width: 180px;
-            height: auto;
-            margin-bottom: 20px;
-            border-radius: 12px; 
-        }
+    .brand-logo {
+      max-width: 180px;
+      height: auto;
+      margin-bottom: 20px;
+      border-radius: 12px; 
+    }
 
-        .rect-btn {
-            background-color: #2a2a2a;
-            color: #ffffff;
-            border: 1px solid #444444;
-            padding: 15px 40px;
-            font-family: inherit;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 250px;
-            border-radius: 4px;
-            transition: 0.2s;
-        }
+    .btn {
+      background: #2a2a2a;
+      color: #fff;
+      border: 1px solid #444;
+      padding: 15px 40px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 250px;
+      border-radius: 4px;
+      transition: 0.2s;
+    }
 
-        .rect-btn:hover {
-            background-color: #444444;
-        }
+    .btn:hover {
+      background: #444;
+    }
 
-        .editor-modal {
-            display: none; 
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000000;
-            z-index: 9999; 
-            flex-direction: column;
-        }
+    .modal-wrapper {
+      display: none; 
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999; 
+      flex-flow: column nowrap;
+    }
 
-        .modal-header {
-            background-color: #1a1a1a;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: flex-end;
-            border-bottom: 2px solid #333;
-        }
+    .modal-head {
+      background: #1a1a1a;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #333;
+    }
 
-        .close-btn {
-            background-color: #ef4444; 
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+    .modal-title {
+      margin: 0;
+      font-size: 18px;
+      font-family: 'Segoe UI', sans-serif;
+      color: #a855f7;
+    }
 
-        .close-btn:hover {
-            background-color: #dc2626;
-        }
+    .btn-close {
+      background: #ef4444; 
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-close:hover { background: #dc2626; }
 
-        #editor-iframe {
-            flex-grow: 1;
-            width: 100%;
-            border: none;
-            background-color: #ffffff;
-        }
-    </style>
+    #app-frame {
+      flex-grow: 1;
+      width: 100%;
+      border: none;
+      background: #fff;
+    }
+  </style>
 </head>
 <body>
 
-    <div id="particles-js"></div>
+  <div id="particles-js"></div>
+  <div class="top-nav"></div>
 
-    <div class="widget-bar"></div>
+  <div class="main-wrap">
+    <svg class="hero-shape" viewBox="0 0 100 100">
+      <polygon points="50,15 15,85 85,85" fill="none" stroke="#fff" stroke-width="0.1" stroke-linejoin="round" />
+      <circle cx="50" cy="15" r="2.5" fill="#a855f7" /> 
+      <circle cx="15" cy="85" r="2.5" fill="#22c55e" /> 
+      <circle cx="85" cy="85" r="2.5" fill="#3b82f6" /> 
+    </svg>
 
-    <div class="content">
-        
-        <svg class="bg-triangle" viewBox="0 0 100 100">
-            <polygon points="50,15 15,85 85,85" fill="none" stroke="#ffffff" stroke-width="0.1" stroke-linejoin="round" />
-            <circle cx="50" cy="15" r="2.5" fill="#a855f7" /> 
-            <circle cx="15" cy="85" r="2.5" fill="#22c55e" /> 
-            <circle cx="85" cy="85" r="2.5" fill="#3b82f6" /> 
-        </svg>
-
-        <div class="frame">
-            <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png?ex=6a13417f&is=6a11efff&hm=06353bd88304c09a2d1f95d2387da0a191387a7f39c3ea2079486ca0f4ce0da8&=&format=webp&quality=lossless&width=362&height=242" alt="GUI Logo" class="logo">
-            
-            <button class="rect-btn" onclick="openEditor()">Open HTML Editor</button>
-            <button class="rect-btn">Button 2</button>
-            <button class="rect-btn">Button 3</button>
-        </div>
+    <div class="menu-box">
+      <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png?ex=6a13417f&is=6a11efff&hm=06353bd88304c09a2d1f95d2387da0a191387a7f39c3ea2079486ca0f4ce0da8&=&format=webp&quality=lossless&width=362&height=242" alt="GUI Logo" class="brand-logo">
+      <button class="btn" onclick="launchApp('html')">Open HTML Editor</button>
+      <button class="btn" onclick="launchApp('apk')">Open APK Editor</button>
+      <button class="btn">Button 3</button>
     </div>
+  </div>
 
-    <div class="editor-modal" id="editor-modal">
-        <div class="modal-header">
-            <button class="close-btn" onclick="closeEditor()">Close Editor</button>
-        </div>
-        <iframe id="editor-iframe"></iframe>
+  <div class="modal-wrapper" id="sys-modal">
+    <div class="modal-head">
+      <h2 class="modal-title" id="m-title">Editor</h2>
+      <button class="btn-close" onclick="closeApp()">Close Editor</button>
     </div>
+    <iframe id="app-frame"></iframe>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": "#ffffff" },
-                "shape": { "type": "circle" },
-                "opacity": { "value": 0.5, "random": false },
-                "size": { "value": 3, "random": true },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#ffffff",
-                    "opacity": 0.3,
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 2,
-                    "direction": "none",
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false
-                }
-            },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": { "enable": true, "mode": "grab" },
-                    "onclick": { "enable": true, "mode": "push" },
-                    "resize": true
-                },
-                "modes": {
-                    "grab": { "distance": 140, "line_linked": { "opacity": 1 } },
-                    "push": { "particles_nb": 4 }
-                }
-            },
-            "retina_detect": true
-        });
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    // dev shorthand
+    const $ = id => document.getElementById(id);
 
-        const editorCode = `<!DOCTYPE html>
-<html lang="en">
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 60, density: { enable: true, value_area: 800 } },
+        color: { value: "#fff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.5 },
+        size: { value: 3, random: true },
+        line_linked: { enable: true, distance: 150, color: "#fff", opacity: 0.3, width: 1 },
+        move: { enable: true, speed: 2, out_mode: "out" }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: { onhover: { enable: true, mode: "grab" }, onclick: { enable: true, mode: "push" }, resize: true },
+        modes: { grab: { distance: 140, line_linked: { opacity: 1 } }, push: { particles_nb: 4 } }
+      },
+      retina_detect: true
+    });
+
+    const tplHTML = `<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live HTML Editor</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #0f0f0f;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .header {
-            background-color: #1a1a1a;
-            padding: 15px 20px;
-            border-bottom: 2px solid #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 20px;
-            color: #a855f7; 
-        }
-
-        .container {
-            display: flex;
-            flex-grow: 1;
-            height: calc(100vh - 52px);
-        }
-
-        .pane {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            border-right: 2px solid #333;
-        }
-
-        .pane:last-child {
-            border-right: none;
-        }
-
-        .pane-label {
-            background-color: #222;
-            padding: 8px 15px;
-            font-size: 14px;
-            color: #888;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid #333;
-        }
-
-        textarea {
-            flex-grow: 1;
-            background-color: #111111;
-            color: #e0e0e0;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            padding: 15px;
-            border: none;
-            resize: none;
-            outline: none;
-            line-height: 1.5;
-        }
-
-        iframe {
-            flex-grow: 1;
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: #ffffff; 
-        }
-    </style>
+  <style>
+    body { margin: 0; background: #0f0f0f; color: #fff; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden; }
+    .col { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #333; }
+    .col:last-child { border: none; }
+    .head { background: #222; padding: 8px 15px; font-size: 14px; font-weight: bold; border-bottom: 1px solid #333; }
+    textarea { flex: 1; background: #111; color: #e0e0e0; font-family: monospace; padding: 15px; border: none; resize: none; outline: none; }
+    iframe { flex: 1; border: none; background: #fff; }
+  </style>
 </head>
 <body>
-
-    <div class="header">
-        <h1>Live HTML Editor</h1>
-    </div>
-
-    <div class="container">
-        <div class="pane">
-            <div class="pane-label">Code (HTML/CSS/JS)</div>
-            <textarea id="editor" spellcheck="false">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;style&gt;
-        body {
-            background-color: #222;
-            color: white;
-            font-family: sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        h1 { color: #22c55e; }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    
-    &lt;h1&gt;Hello World!&lt;/h1&gt;
-    &lt;p&gt;Start typing on the left to see changes instantly.&lt;/p&gt;
-
-&lt;/body&gt;
-&lt;/html&gt;</textarea>
-        </div>
-
-        <div class="pane">
-            <div class="pane-label">Live Preview</div>
-            <iframe id="preview"></iframe>
-        </div>
-    </div>
-
-    <script>
-        const editor = document.getElementById('editor');
-        const preview = document.getElementById('preview');
-
-        function updatePreview() {
-            const code = editor.value;
-            const previewDoc = preview.contentDocument || preview.contentWindow.document;
-            
-            previewDoc.open();
-            previewDoc.write(code);
-            previewDoc.close();
-        }
-
-        editor.addEventListener('input', updatePreview);
-
-        updatePreview();
-    <\/script>
+  <div class="col">
+    <div class="head">Code</div>
+    <textarea id="src" spellcheck="false">&lt;h1 style="color:#22c55e"&gt;Hello World!&lt;/h1&gt;</textarea>
+  </div>
+  <div class="col">
+    <div class="head">Preview</div>
+    <iframe id="view"></iframe>
+  </div>
+  <script>
+    const s = document.getElementById('src'), v = document.getElementById('view');
+    const update = () => {
+      const doc = v.contentDocument || v.contentWindow.document;
+      doc.open(); doc.write(s.value); doc.close();
+    };
+    s.addEventListener('input', update);
+    update();
+  <\/script>
 </body>
 </html>`;
 
-        function openEditor() {
-            document.getElementById('editor-modal').style.display = 'flex';
-            document.getElementById('editor-iframe').srcdoc = editorCode;
-        }
+    const tplAPK = `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; background: #0f0f0f; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    .bar { background: #1a1a1a; padding: 10px 20px; border-bottom: 1px solid #333; display: flex; gap: 15px; align-items: center; }
+    .btn { background: #a855f7; color: #fff; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; }
+    input[type="file"] { display: none; }
+    .wrap { display: flex; flex: 1; }
+    .side { width: 250px; background: #111; border-right: 2px solid #333; }
+    .title { background: #222; padding: 8px 15px; font-size: 14px; font-weight: bold; }
+    ul { list-style: none; padding: 10px; margin: 0; font-family: monospace; font-size: 14px; display: none; }
+    li { padding: 5px 0; cursor: pointer; color: #ccc; }
+    li:hover { color: #a855f7; }
+    textarea { flex: 1; background: #0a0a0a; color: #eee; font-family: monospace; padding: 15px; border: none; outline: none; resize: none; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <label class="btn">Open APK <input type="file" id="up" accept=".apk"></label>
+    <span id="msg">Waiting...</span>
+  </div>
+  <div class="wrap">
+    <div class="side">
+      <div class="title">Files</div>
+      <ul id="tree">
+        <li>/res/</li>
+        <li>/smali/</li>
+        <li>AndroidManifest.xml</li>
+        <li>classes.dex</li>
+      </ul>
+    </div>
+    <textarea id="code" readonly>Upload APK...</textarea>
+  </div>
+  <script>
+    document.getElementById('up').addEventListener('change', e => {
+      if(!e.target.files.length) return;
+      document.getElementById('msg').innerText = 'Extracting ' + e.target.files[0].name;
+      document.getElementById('code').value = 'Analyzing structure...';
+      setTimeout(() => {
+        document.getElementById('msg').innerText = 'Loaded.';
+        document.getElementById('tree').style.display = 'block';
+        document.getElementById('code').value = '// APK decompiled in mock environment.\\n// Select files from left to edit.';
+      }, 1000);
+    });
+  <\/script>
+</body>
+</html>`;
 
-        function closeEditor() {
-            document.getElementById('editor-modal').style.display = 'none';
-            document.getElementById('editor-iframe').srcdoc = '';
-        }
-    </script>
+    function launchApp(type) {
+      const modal = $('sys-modal');
+      const frame = $('app-frame');
+      const title = $('m-title');
+
+      if (type === 'html') {
+        title.innerText = "Live HTML Editor";
+        frame.srcdoc = tplHTML;
+      } else {
+        title.innerText = "APK Opener";
+        frame.srcdoc = tplAPK;
+      }
+      modal.style.display = 'flex';
+    }
+
+    function closeApp() {
+      $('sys-modal').style.display = 'none';
+      $('app-frame').srcdoc = '';
+    }
+  </script>
 </body>
 </html>
