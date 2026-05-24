@@ -13,9 +13,28 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            overflow: hidden; 
         }
 
-        /* The main container to center everything */
+        /* Particles layer in the deep background */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        .widget-bar {
+            background-color: #1a1a1a; 
+            width: 100%;
+            min-height: 60px;
+            border-bottom: 2px solid #333333;
+            position: relative;
+            z-index: 3;
+        }
+
         .content {
             flex-grow: 1;
             display: flex;
@@ -23,15 +42,41 @@
             align-items: center;
             padding: 20px;
             box-sizing: border-box;
+            position: relative;
+            z-index: 1;
         }
 
-        /* The dark gray box in the middle */
+        /* The massive, spinning background triangle */
+        .bg-triangle {
+            position: absolute;
+            width: 750px;
+            height: 750px;
+            /* Center the element */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1; /* Sits behind the frame but in front of particles */
+            pointer-events: none; /* Stops it from blocking button clicks */
+            /* Add spin animation */
+            animation: spin 15s linear infinite;
+        }
+
+        /* Define the spin animation */
+        @keyframes spin {
+          0% {
+            transform: translate(-50%, -50%) rotate(0deg);
+          }
+          100% {
+            transform: translate(-50%, -50%) rotate(360deg);
+          }
+        }
+
         .frame {
-            background-color: #111111; /* Dark gray to match your screenshot */
+            background-color: rgba(17, 17, 17, 0.75); /* Transparent enough to see the triangle behind it */
             border: 1px solid #222222;
             border-radius: 8px;
             width: 100%;
-            max-width: 500px; /* Kept compact like the image */
+            max-width: 500px;
             padding: 50px 40px;
             display: flex;
             flex-direction: column;
@@ -39,18 +84,17 @@
             align-items: center;
             gap: 15px;
             box-sizing: border-box;
+            backdrop-filter: blur(6px); /* Blurs the lines of the triangle as they pass behind the box */
+            z-index: 2; /* Sits on top of the triangle */
         }
 
-        /* The logo */
         .logo {
             max-width: 180px;
             height: auto;
             margin-bottom: 20px;
-            /* If your image has a white box, this will round the corners slightly so it doesn't look as harsh */
             border-radius: 12px; 
         }
 
-        /* The rectangular buttons */
         .rect-btn {
             background-color: #2a2a2a;
             color: #ffffff;
@@ -62,18 +106,28 @@
             cursor: pointer;
             width: 250px;
             border-radius: 4px;
+            transition: 0.2s;
         }
 
         .rect-btn:hover {
-            background-color: #3a3a3a;
+            background-color: #444444;
         }
     </style>
 </head>
 <body>
 
+    <div id="particles-js"></div>
+
+    <div class="widget-bar"></div>
+
     <div class="content">
+        
+        <svg class="bg-triangle" viewBox="0 0 100 100">
+            <polygon points="50,15 15,85 85,85" fill="none" stroke="#ffffff" stroke-width="0.1" stroke-linejoin="round" />
+            <circle cx="50" cy="15" r="2.5" fill="#a855f7" /> <circle cx="15" cy="85" r="2.5" fill="#22c55e" /> <circle cx="85" cy="85" r="2.5" fill="#3b82f6" /> </svg>
+
         <div class="frame">
-            <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png" alt="GUI Logo" class="logo">
+            <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png?ex=6a13417f&is=6a11efff&hm=06353bd88304c09a2d1f95d2387da0a191387a7f39c3ea2079486ca0f4ce0da8&=&format=webp&quality=lossless&width=362&height=242" alt="GUI Logo" class="logo">
             
             <button class="rect-btn">Button 1</button>
             <button class="rect-btn">Button 2</button>
@@ -81,5 +135,46 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#ffffff" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": false },
+                "size": { "value": 3, "random": true },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.3,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "grab" },
+                    "onclick": { "enable": true, "mode": "push" },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": { "distance": 140, "line_linked": { "opacity": 1 } },
+                    "push": { "particles_nb": 4 }
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
 </body>
 </html>
