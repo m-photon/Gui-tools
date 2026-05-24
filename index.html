@@ -188,7 +188,7 @@
         <button class="btn-close" onclick="closeApp()">Close App</button>
       </div>
     </div>
-    <iframe id="app-frame"></iframe>
+    <iframe id="app-frame" allowfullscreen></iframe>
   </div>
 
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
@@ -232,7 +232,7 @@
   </div>
   <div class="col">
     <div class="head">Preview</div>
-    <iframe id="view"></iframe>
+    <iframe id="view" allowfullscreen></iframe>
   </div>
   <script>
     const s = document.getElementById('src'), v = document.getElementById('view');
@@ -311,12 +311,28 @@
     }
 
     function toggleFS() {
-      // Now targets only the iframe element
       const frame = $('app-frame');
-      if (!document.fullscreenElement) {
-        frame.requestFullscreen().catch(err => console.log(err));
-      } else {
-        document.exitFullscreen();
+      
+      try {
+       
+        const innerDoc = frame.contentDocument || frame.contentWindow.document;
+        const viewFrame = innerDoc.getElementById('view');
+        
+       
+        const targetElement = viewFrame ? viewFrame : frame;
+
+        if (!document.fullscreenElement) {
+          targetElement.requestFullscreen().catch(err => console.log(err));
+        } else {
+          document.exitFullscreen();
+        }
+      } catch (e) {
+        // Fallback just in case browser security blocks reading the iframe
+        if (!document.fullscreenElement) {
+          frame.requestFullscreen().catch(err => console.log(err));
+        } else {
+          document.exitFullscreen();
+        }
       }
     }
 
