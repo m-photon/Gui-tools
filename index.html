@@ -125,6 +125,22 @@
       color: #a855f7;
     }
 
+    .head-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-fs {
+      background: #3b82f6; 
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-fs:hover { background: #2563eb; }
+
     .btn-close {
       background: #ef4444; 
       color: #fff;
@@ -161,14 +177,16 @@
       <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png?ex=6a13417f&is=6a11efff&hm=06353bd88304c09a2d1f95d2387da0a191387a7f39c3ea2079486ca0f4ce0da8&=&format=webp&quality=lossless&width=362&height=242" alt="GUI Logo" class="brand-logo">
       <button class="btn" onclick="launchApp('html')">Open HTML Editor</button>
       <button class="btn" onclick="launchApp('apk')">Open APK Editor</button>
-      <button class="btn" onclick="launchApp('sound')">Open Soundboard</button>
     </div>
   </div>
 
   <div class="modal-wrapper" id="sys-modal">
     <div class="modal-head">
       <h2 class="modal-title" id="m-title">Editor</h2>
-      <button class="btn-close" onclick="closeApp()">Close App</button>
+      <div class="head-actions">
+        <button class="btn-fs" onclick="toggleFS()">Fullscreen</button>
+        <button class="btn-close" onclick="closeApp()">Close App</button>
+      </div>
     </div>
     <iframe id="app-frame"></iframe>
   </div>
@@ -277,351 +295,6 @@
 </body>
 </html>`;
 
-    const tplSound = `<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { margin: 0; background: #0f0f0f; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-    .bar { background: #1a1a1a; padding: 15px 20px; border-bottom: 1px solid #333; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-    .bar input { background: #111; border: 1px solid #444; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; width: 350px; outline: none; }
-    .bar input:focus { border-color: #a855f7; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding: 20px; overflow-y: auto; flex: 1; align-content: start; }
-    .snd-btn { background: #111; border: 2px solid #333; border-radius: 8px; padding: 15px 10px; color: #eee; cursor: pointer; transition: 0.1s; font-weight: bold; text-align: center; font-size: 13px; }
-    .snd-btn:active { background: #a855f7; border-color: #a855f7; color: #fff; transform: scale(0.95); }
-    .no-res { color: #888; text-align: center; padding: 40px; grid-column: 1 / -1; }
-  </style>
-</head>
-<body>
-  <div class="bar">
-    <input type="text" id="srch" placeholder="Search the master library..." autocomplete="off">
-  </div>
-  <div class="grid" id="board"></div>
-  <script>
-    const sounds = [
-      { n: "Vine Boom", u: "https://www.myinstants.com/media/sounds/vine-boom.mp3" },
-      { n: "Bruh", u: "https://www.myinstants.com/media/sounds/movie_1.mp3" },
-      { n: "Airhorn", u: "https://www.myinstants.com/media/sounds/mlg-airhorn.mp3" },
-      { n: "Taco Bell", u: "https://www.myinstants.com/media/sounds/taco-bell-bong-sfx.mp3" },
-      { n: "Fart Reverb", u: "https://www.myinstants.com/media/sounds/fart-with-reverb.mp3" },
-      { n: "Sad Violin", u: "https://www.myinstants.com/media/sounds/sad-violin.mp3" },
-      { n: "Among Us", u: "https://www.myinstants.com/media/sounds/among-us-role-reveal-sound.mp3" },
-      { n: "Spongebob Fail", u: "https://www.myinstants.com/media/sounds/spongebob-fail.mp3" },
-      { n: "Directed By", u: "https://www.myinstants.com/media/sounds/directed-by-robert-b_WeBmVHn.mp3" },
-      { n: "FBI Open Up", u: "https://www.myinstants.com/media/sounds/fbi-open-up-sfx.mp3" },
-      { n: "Metal Pipe", u: "https://www.myinstants.com/media/sounds/metal-pipe-falling-sound-effect-1.mp3" },
-      { n: "Quack", u: "https://www.myinstants.com/media/sounds/quack_5.mp3" },
-      { n: "Oof", u: "https://www.myinstants.com/media/sounds/roblox-death-sound_1.mp3" },
-      { n: "Aw Shit", u: "https://www.myinstants.com/media/sounds/gta-san-andreas-ah-shit-here-we-go-again_1.mp3" },
-      { n: "Run", u: "https://www.myinstants.com/media/sounds/run-vine-sound-effect_1.mp3" },
-      { n: "Nani", u: "https://www.myinstants.com/media/sounds/omae-wa-mou-shindeiru.mp3" },
-      { n: "Illuminati", u: "https://www.myinstants.com/media/sounds/illuminati-confirmed.mp3" },
-      { n: "John Cena", u: "https://www.myinstants.com/media/sounds/and-his-name-is-john-cena-1.mp3" },
-      { n: "Windows XP", u: "https://www.myinstants.com/media/sounds/windows-xp-error.mp3" },
-      { n: "Wilhelm", u: "https://www.myinstants.com/media/sounds/wilhelm_scream.mp3" },
-      { n: "Ba Dum Tss", u: "https://www.myinstants.com/media/sounds/ba-dum-tsss.mp3" },
-      { n: "Crickets", u: "https://www.myinstants.com/media/sounds/crickets.mp3" },
-      { n: "Nope", u: "https://www.myinstants.com/media/sounds/engineer_no01.mp3" },
-      { n: "Wasted", u: "https://www.myinstants.com/media/sounds/gta-v-wasted.mp3" },
-      { n: "To Be Continued", u: "https://www.myinstants.com/media/sounds/to-be-continued.mp3" },
-      { n: "Yee", u: "https://www.myinstants.com/media/sounds/yee.mp3" },
-      { n: "Some Milk", u: "https://www.myinstants.com/media/sounds/he-needs-some-milk_1.mp3" },
-      { n: "Why Run", u: "https://www.myinstants.com/media/sounds/why-are-you-running.mp3" },
-      { n: "Bonk", u: "https://www.myinstants.com/media/sounds/bonk-sound-effect_1.mp3" },
-      { n: "Hell Naw", u: "https://www.myinstants.com/media/sounds/hell-naw-to-the-naw-naw-naw.mp3" },
-      { n: "Sheesh", u: "https://www.myinstants.com/media/sounds/sheesh.mp3" },
-      { n: "Emotional", u: "https://www.myinstants.com/media/sounds/emotional-damage-meme.mp3" },
-      { n: "Bing Chilling", u: "https://www.myinstants.com/media/sounds/bing-chilling.mp3" },
-      { n: "Wow", u: "https://www.myinstants.com/media/sounds/anime-wow-sound-effect.mp3" },
-      { n: "Nokia", u: "https://www.myinstants.com/media/sounds/nokia-ringtone-arabic.mp3" },
-      { n: "Error", u: "https://www.myinstants.com/media/sounds/error_CDpnDFX.mp3" },
-      { n: "Dun Dun Dun", u: "https://www.myinstants.com/media/sounds/dun_dun_1.mp3" },
-      { n: "Holy Music", u: "https://www.myinstants.com/media/sounds/holy-music-stops.mp3" },
-      { n: "Augh", u: "https://www.myinstants.com/media/sounds/aughhh.mp3" },
-      { n: "Rizz", u: "https://www.myinstants.com/media/sounds/rizz-sound-effect.mp3" },
-      { n: "Prowler", u: "https://www.myinstants.com/media/sounds/prowler-theme.mp3" },
-      { n: "Goofy Ahh", u: "https://www.myinstants.com/media/sounds/goofy-ahh-sounds.mp3" },
-      { n: "SUII", u: "https://www.myinstants.com/media/sounds/cristiano-ronaldo-suiii.mp3" },
-      { n: "What Dog Doin", u: "https://www.myinstants.com/media/sounds/what-the-dog-doin.mp3" },
-      { n: "Baba Booey", u: "https://www.myinstants.com/media/sounds/baba-booey.mp3" },
-      { n: "Bleep", u: "https://www.myinstants.com/media/sounds/censor-beep-1.mp3" },
-      { n: "Do It", u: "https://www.myinstants.com/media/sounds/do-it_3.mp3" },
-      { n: "Evil Laugh", u: "https://www.myinstants.com/media/sounds/evil-laugh.mp3" },
-      { n: "Flawless", u: "https://www.myinstants.com/media/sounds/flawless-victory.mp3" },
-      { n: "Fatality", u: "https://www.myinstants.com/media/sounds/fatality.mp3" },
-      { n: "Finish Him", u: "https://www.myinstants.com/media/sounds/finish-him.mp3" },
-      { n: "Giga Chad", u: "https://www.myinstants.com/media/sounds/gigachad-theme.mp3" },
-      { n: "Mission Fail", u: "https://www.myinstants.com/media/sounds/mission-failed-we-ll-get-em-next-time.mp3" },
-      { n: "Punch", u: "https://www.myinstants.com/media/sounds/punch.mp3" },
-      { n: "Record Scratch", u: "https://www.myinstants.com/media/sounds/record-scratch.mp3" },
-      { n: "Sus", u: "https://www.myinstants.com/media/sounds/among-us-suspense-sound.mp3" },
-      { n: "Target Acquired", u: "https://www.myinstants.com/media/sounds/target-acquired.mp3" },
-      { n: "Wrong Buzzer", u: "https://www.myinstants.com/media/sounds/wrong-buzzer.mp3" },
-      { n: "Yipee", u: "https://www.myinstants.com/media/sounds/yipee.mp3" },
-      { n: "Megalovania", u: "https://www.myinstants.com/media/sounds/megalovania.mp3" },
-      { n: "Ah Ha Ha", u: "https://www.myinstants.com/media/sounds/ah-ha-ha.mp3" },
-      { n: "Boing", u: "https://www.myinstants.com/media/sounds/boing_spring.mp3" },
-      { n: "Cash Register", u: "https://www.myinstants.com/media/sounds/cash-register-ka-ching.mp3" },
-      { n: "Drum Roll", u: "https://www.myinstants.com/media/sounds/drum-roll.mp3" },
-      { n: "Gasp", u: "https://www.myinstants.com/media/sounds/gasp.mp3" },
-      { n: "Hallelujah", u: "https://www.myinstants.com/media/sounds/hallelujah.mp3" },
-      { n: "Mario Jump", u: "https://www.myinstants.com/media/sounds/mario-jump-sound-effect.mp3" },
-      { n: "MGE Brother", u: "https://www.myinstants.com/media/sounds/mge-brother.mp3" },
-      { n: "Oh My God", u: "https://www.myinstants.com/media/sounds/oh-my-god.mp3" },
-      { n: "Slap", u: "https://www.myinstants.com/media/sounds/slap.mp3" },
-      { n: "Trombone", u: "https://www.myinstants.com/media/sounds/sad-trombone.mp3" },
-      { n: "Wah Wah", u: "https://www.myinstants.com/media/sounds/wah-wah-wah-wah.mp3" },
-      { n: "Victory FF", u: "https://www.myinstants.com/media/sounds/final-fantasy-vii-victory-fanfare.mp3" },
-      { n: "Zelda Secret", u: "https://www.myinstants.com/media/sounds/zelda-secret.mp3" },
-      { n: "MGS Alert", u: "https://www.myinstants.com/media/sounds/metal-gear-solid-alert.mp3" },
-      { n: "Bazinga", u: "https://www.myinstants.com/media/sounds/bazinga.mp3" },
-      { n: "Chewbacca", u: "https://www.myinstants.com/media/sounds/chewbacca.mp3" },
-      { n: "Darth Vader", u: "https://www.myinstants.com/media/sounds/darth-vader-no.mp3" },
-      { n: "Hadouken", u: "https://www.myinstants.com/media/sounds/hadouken.mp3" },
-      { n: "Pikachu", u: "https://www.myinstants.com/media/sounds/pikachu.mp3" },
-      { n: "Homer D'oh", u: "https://www.myinstants.com/media/sounds/homer-doh.mp3" },
-      { n: "Wilhelm 2", u: "https://www.myinstants.com/media/sounds/wilhelm.mp3" },
-      { n: "Crickets 2", u: "https://www.myinstants.com/media/sounds/cricket.mp3" },
-      { n: "Fart", u: "https://www.myinstants.com/media/sounds/fart.mp3" },
-      { n: "Burp", u: "https://www.myinstants.com/media/sounds/burp.mp3" },
-      { n: "Sneeze", u: "https://www.myinstants.com/media/sounds/sneeze.mp3" },
-      { n: "Snore", u: "https://www.myinstants.com/media/sounds/snore.mp3" },
-      { n: "Yawn", u: "https://www.myinstants.com/media/sounds/yawn.mp3" },
-      { n: "Laugh Track", u: "https://www.myinstants.com/media/sounds/laugh-track.mp3" },
-      { n: "Boo", u: "https://www.myinstants.com/media/sounds/boo.mp3" },
-      { n: "Cheer", u: "https://www.myinstants.com/media/sounds/cheer.mp3" },
-      { n: "Applause", u: "https://www.myinstants.com/media/sounds/applause.mp3" },
-      { n: "Aww", u: "https://www.myinstants.com/media/sounds/aww.mp3" },
-      { n: "Ooo", u: "https://www.myinstants.com/media/sounds/ooo.mp3" },
-      { n: "Gulp", u: "https://www.myinstants.com/media/sounds/gulp.mp3" },
-      { n: "Heartbeat", u: "https://www.myinstants.com/media/sounds/heartbeat.mp3" },
-      { n: "Clock Tick", u: "https://www.myinstants.com/media/sounds/clock-ticking.mp3" },
-      { n: "Censored", u: "https://www.myinstants.com/media/sounds/censored.mp3" },
-      { n: "Camera", u: "https://www.myinstants.com/media/sounds/camera-shutter.mp3" },
-      { n: "Gong", u: "https://www.myinstants.com/media/sounds/gong.mp3" },
-      { n: "Mmm Whatcha Say", u: "https://www.myinstants.com/media/sounds/mmm-whatcha-say.mp3" },
-      { n: "Amogus", u: "https://www.myinstants.com/media/sounds/amogus.mp3" },
-      { n: "Yeet", u: "https://www.myinstants.com/media/sounds/yeet.mp3" },
-      { n: "Deez Nuts", u: "https://www.myinstants.com/media/sounds/deez-nuts.mp3" },
-      { n: "Got Eem", u: "https://www.myinstants.com/media/sounds/got-eem.mp3" },
-      { n: "Oof Size Large", u: "https://www.myinstants.com/media/sounds/oof-size-large.mp3" },
-      { n: "Do a Barrel Roll", u: "https://www.myinstants.com/media/sounds/do-a-barrel-roll.mp3" },
-      { n: "Hello There", u: "https://www.myinstants.com/media/sounds/hello-there.mp3" },
-      { n: "General Kenobi", u: "https://www.myinstants.com/media/sounds/general-kenobi.mp3" },
-      { n: "FBI Open Up 2", u: "https://www.myinstants.com/media/sounds/fbi-open-up.mp3" },
-      { n: "Sad Trombone 2", u: "https://www.myinstants.com/media/sounds/sadtrombone.mp3" },
-      { n: "Airhorn 2", u: "https://www.myinstants.com/media/sounds/airhorn.mp3" },
-      { n: "Nope (Engineer)", u: "https://www.myinstants.com/media/sounds/nope.mp3" },
-      { n: "Medic!", u: "https://www.myinstants.com/media/sounds/medic.mp3" },
-      { n: "Spy!", u: "https://www.myinstants.com/media/sounds/spy.mp3" },
-      { n: "Pootis", u: "https://www.myinstants.com/media/sounds/pootis.mp3" },
-      { n: "Headshot", u: "https://www.myinstants.com/media/sounds/headshot.mp3" },
-      { n: "Monster Kill", u: "https://www.myinstants.com/media/sounds/monsterkill.mp3" },
-      { n: "Godlike", u: "https://www.myinstants.com/media/sounds/godlike.mp3" },
-      { n: "Holy Shit", u: "https://www.myinstants.com/media/sounds/holyshit.mp3" },
-      { n: "Ludicrous Kill", u: "https://www.myinstants.com/media/sounds/ludicrous-kill.mp3" },
-      { n: "Dominating", u: "https://www.myinstants.com/media/sounds/dominating.mp3" },
-      { n: "First Blood", u: "https://www.myinstants.com/media/sounds/firstblood.mp3" },
-      { n: "Double Kill", u: "https://www.myinstants.com/media/sounds/doublekill.mp3" },
-      { n: "Triple Kill", u: "https://www.myinstants.com/media/sounds/triplekill.mp3" },
-      { n: "Multi Kill", u: "https://www.myinstants.com/media/sounds/multikill.mp3" },
-      { n: "Ultra Kill", u: "https://www.myinstants.com/media/sounds/ultrakill.mp3" },
-      { n: "Rampage", u: "https://www.myinstants.com/media/sounds/rampage.mp3" },
-      { n: "Unstoppable", u: "https://www.myinstants.com/media/sounds/unstoppable.mp3" },
-      { n: "Wombo Combo", u: "https://www.myinstants.com/media/sounds/wombo-combo.mp3" },
-      { n: "Falcon Punch", u: "https://www.myinstants.com/media/sounds/falcon-punch.mp3" },
-      { n: "Show Me Your Moves", u: "https://www.myinstants.com/media/sounds/show-me-your-moves.mp3" },
-      { n: "PK Fire", u: "https://www.myinstants.com/media/sounds/pk-fire.mp3" },
-      { n: "Game!", u: "https://www.myinstants.com/media/sounds/game.mp3" },
-      { n: "Super Mario Bros", u: "https://www.myinstants.com/media/sounds/super-mario-bros.mp3" },
-      { n: "Coin", u: "https://www.myinstants.com/media/sounds/smw_coin.mp3" },
-      { n: "1-Up", u: "https://www.myinstants.com/media/sounds/smw_1-up.mp3" },
-      { n: "Mushroom", u: "https://www.myinstants.com/media/sounds/smb_powerup.mp3" },
-      { n: "Pipe", u: "https://www.myinstants.com/media/sounds/smb_pipe.mp3" },
-      { n: "Fireball", u: "https://www.myinstants.com/media/sounds/smb_fireball.mp3" },
-      { n: "Sonic Ring", u: "https://www.myinstants.com/media/sounds/sonic-ring.mp3" },
-      { n: "Spring Yard", u: "https://www.myinstants.com/media/sounds/spring-yard.mp3" },
-      { n: "Chaos Emerald", u: "https://www.myinstants.com/media/sounds/chaos-emerald.mp3" },
-      { n: "Zelda Item", u: "https://www.myinstants.com/media/sounds/zelda-item.mp3" },
-      { n: "Zelda Chest", u: "https://www.myinstants.com/media/sounds/zelda-chest.mp3" },
-      { n: "Navi Listen", u: "https://www.myinstants.com/media/sounds/navi-listen.mp3" },
-      { n: "Pokemon Heal", u: "https://www.myinstants.com/media/sounds/pokemon-heal.mp3" },
-      { n: "Level Up", u: "https://www.myinstants.com/media/sounds/level-up.mp3" },
-      { n: "Mii Channel", u: "https://www.myinstants.com/media/sounds/mii-channel.mp3" },
-      { n: "Wii Sports", u: "https://www.myinstants.com/media/sounds/wii-sports.mp3" },
-      { n: "Discord Ping", u: "https://www.myinstants.com/media/sounds/discord-notification.mp3" },
-      { n: "Discord Leave", u: "https://www.myinstants.com/media/sounds/discord-leave.mp3" },
-      { n: "Teams Call", u: "https://www.myinstants.com/media/sounds/teams-call.mp3" },
-      { n: "Skype Call", u: "https://www.myinstants.com/media/sounds/skype-call.mp3" },
-      { n: "iPhone Radar", u: "https://www.myinstants.com/media/sounds/iphone-radar.mp3" },
-      { n: "PS2 Startup", u: "https://www.myinstants.com/media/sounds/ps2-startup.mp3" },
-      { n: "Gamecube", u: "https://www.myinstants.com/media/sounds/gamecube.mp3" },
-      { n: "Xbox 360", u: "https://www.myinstants.com/media/sounds/xbox-360.mp3" },
-      { n: "EA Sports", u: "https://www.myinstants.com/media/sounds/ea-sports.mp3" },
-      { n: "Seinfeld", u: "https://www.myinstants.com/media/sounds/seinfeld.mp3" },
-      { n: "Curb Your", u: "https://www.myinstants.com/media/sounds/curb-your-enthusiasm.mp3" },
-      { n: "X-Files", u: "https://www.myinstants.com/media/sounds/x-files.mp3" },
-      { n: "Law & Order", u: "https://www.myinstants.com/media/sounds/law-and-order.mp3" },
-      { n: "Price is Right", u: "https://www.myinstants.com/media/sounds/price-is-right.mp3" },
-      { n: "Jeopardy", u: "https://www.myinstants.com/media/sounds/jeopardy.mp3" },
-      { n: "Gottagofast", u: "https://www.myinstants.com/media/sounds/gottagofast.mp3" },
-      { n: "Sanic", u: "https://www.myinstants.com/media/sounds/sanic.mp3" },
-      { n: "Deja Vu", u: "https://www.myinstants.com/media/sounds/deja-vu.mp3" },
-      { n: "Gas Gas Gas", u: "https://www.myinstants.com/media/sounds/gas-gas-gas.mp3" },
-      { n: "Running in the 90s", u: "https://www.myinstants.com/media/sounds/running-in-the-90s.mp3" },
-      { n: "Megalovania 2", u: "https://www.myinstants.com/media/sounds/megalovania-2.mp3" },
-      { n: "Sans", u: "https://www.myinstants.com/media/sounds/sans.mp3" },
-      { n: "Papyrus", u: "https://www.myinstants.com/media/sounds/papyrus.mp3" },
-      { n: "Oof Size Max", u: "https://www.myinstants.com/media/sounds/oof-size-max.mp3" },
-      { n: "Stop the Cap", u: "https://www.myinstants.com/media/sounds/stop-the-cap.mp3" },
-      { n: "Look at this Dude", u: "https://www.myinstants.com/media/sounds/look-at-this-dude.mp3" },
-      { n: "Oh No", u: "https://www.myinstants.com/media/sounds/oh-no.mp3" },
-      { n: "Oh No No No", u: "https://www.myinstants.com/media/sounds/oh-no-no-no.mp3" },
-      { n: "SpongeBob Time", u: "https://www.myinstants.com/media/sounds/spongebob-time.mp3" },
-      { n: "2000 Years Later", u: "https://www.myinstants.com/media/sounds/2000-years-later.mp3" },
-      { n: "A Few Moments Later", u: "https://www.myinstants.com/media/sounds/a-few-moments-later.mp3" },
-      { n: "French Narrator", u: "https://www.myinstants.com/media/sounds/french-narrator.mp3" },
-      { n: "My Leg", u: "https://www.myinstants.com/media/sounds/my-leg.mp3" },
-      { n: "Dolphin Chirp", u: "https://www.myinstants.com/media/sounds/dolphin-chirp.mp3" },
-      { n: "Tartar Sauce", u: "https://www.myinstants.com/media/sounds/tartar-sauce.mp3" },
-      { n: "Patrick Star", u: "https://www.myinstants.com/media/sounds/patrick-star.mp3" },
-      { n: "Squidward", u: "https://www.myinstants.com/media/sounds/squidward.mp3" },
-      { n: "Mr Krabs", u: "https://www.myinstants.com/media/sounds/mr-krabs.mp3" },
-      { n: "Plankton", u: "https://www.myinstants.com/media/sounds/plankton.mp3" },
-      { n: "Gary Snail", u: "https://www.myinstants.com/media/sounds/gary-snail.mp3" },
-      { n: "Rick Roll", u: "https://www.myinstants.com/media/sounds/rick-roll.mp3" },
-      { n: "Never Gonna", u: "https://www.myinstants.com/media/sounds/never-gonna.mp3" },
-      { n: "Give You Up", u: "https://www.myinstants.com/media/sounds/give-you-up.mp3" },
-      { n: "Let You Down", u: "https://www.myinstants.com/media/sounds/let-you-down.mp3" },
-      { n: "Desert You", u: "https://www.myinstants.com/media/sounds/desert-you.mp3" },
-      { n: "Make You Cry", u: "https://www.myinstants.com/media/sounds/make-you-cry.mp3" },
-      { n: "Say Goodbye", u: "https://www.myinstants.com/media/sounds/say-goodbye.mp3" },
-      { n: "Tell a Lie", u: "https://www.myinstants.com/media/sounds/tell-a-lie.mp3" },
-      { n: "Hurt You", u: "https://www.myinstants.com/media/sounds/hurt-you.mp3" },
-      { n: "Baka", u: "https://www.myinstants.com/media/sounds/baka.mp3" },
-      { n: "Yare Yare", u: "https://www.myinstants.com/media/sounds/yare-yare-daze.mp3" },
-      { n: "Za Warudo", u: "https://www.myinstants.com/media/sounds/za-warudo.mp3" },
-      { n: "Muda Muda", u: "https://www.myinstants.com/media/sounds/muda-muda.mp3" },
-      { n: "Ora Ora", u: "https://www.myinstants.com/media/sounds/ora-ora.mp3" },
-      { n: "Kono Dio Da", u: "https://www.myinstants.com/media/sounds/kono-dio-da.mp3" },
-      { n: "Wryyy", u: "https://www.myinstants.com/media/sounds/wryyy.mp3" },
-      { n: "Giorno Theme", u: "https://www.myinstants.com/media/sounds/giorno-theme.mp3" },
-      { n: "Kamehameha", u: "https://www.myinstants.com/media/sounds/kamehameha.mp3" },
-      { n: "Over 9000", u: "https://www.myinstants.com/media/sounds/over-9000.mp3" },
-      { n: "Super Saiyan", u: "https://www.myinstants.com/media/sounds/super-saiyan.mp3" },
-      { n: "Instant Transmission", u: "https://www.myinstants.com/media/sounds/instant-transmission.mp3" },
-      { n: "Naruto Run", u: "https://www.myinstants.com/media/sounds/naruto-run.mp3" },
-      { n: "Chidori", u: "https://www.myinstants.com/media/sounds/chidori.mp3" },
-      { n: "Rasengan", u: "https://www.myinstants.com/media/sounds/rasengan.mp3" },
-      { n: "Amaterasu", u: "https://www.myinstants.com/media/sounds/amaterasu.mp3" },
-      { n: "Shadow Clone", u: "https://www.myinstants.com/media/sounds/shadow-clone.mp3" },
-      { n: "Tatakae", u: "https://www.myinstants.com/media/sounds/tatakae.mp3" },
-      { n: "Shinzo wo Sasageyo", u: "https://www.myinstants.com/media/sounds/shinzo-wo-sasageyo.mp3" },
-      { n: "Yamete Kudasai", u: "https://www.myinstants.com/media/sounds/yamete-kudasai.mp3" },
-      { n: "Ara Ara", u: "https://www.myinstants.com/media/sounds/ara-ara.mp3" },
-      { n: "Nico Nico Nii", u: "https://www.myinstants.com/media/sounds/nico-nico-nii.mp3" },
-      { n: "Tuturu", u: "https://www.myinstants.com/media/sounds/tuturu.mp3" },
-      { n: "Notice Me Senpai", u: "https://www.myinstants.com/media/sounds/notice-me-senpai.mp3" },
-      { n: "FBI Chan", u: "https://www.myinstants.com/media/sounds/fbi-chan.mp3" },
-      { n: "Minecraft Zombie", u: "https://www.myinstants.com/media/sounds/minecraft-zombie.mp3" },
-      { n: "Minecraft Creeper", u: "https://www.myinstants.com/media/sounds/minecraft-creeper.mp3" },
-      { n: "Minecraft Skeleton", u: "https://www.myinstants.com/media/sounds/minecraft-skeleton.mp3" },
-      { n: "Minecraft Spider", u: "https://www.myinstants.com/media/sounds/minecraft-spider.mp3" },
-      { n: "Minecraft Enderman", u: "https://www.myinstants.com/media/sounds/minecraft-enderman.mp3" },
-      { n: "Minecraft Villager", u: "https://www.myinstants.com/media/sounds/minecraft-villager.mp3" },
-      { n: "Minecraft Pig", u: "https://www.myinstants.com/media/sounds/minecraft-pig.mp3" },
-      { n: "Minecraft Cow", u: "https://www.myinstants.com/media/sounds/minecraft-cow.mp3" },
-      { n: "Minecraft Sheep", u: "https://www.myinstants.com/media/sounds/minecraft-sheep.mp3" },
-      { n: "Minecraft Chicken", u: "https://www.myinstants.com/media/sounds/minecraft-chicken.mp3" },
-      { n: "Minecraft Dog", u: "https://www.myinstants.com/media/sounds/minecraft-dog.mp3" },
-      { n: "Minecraft Cat", u: "https://www.myinstants.com/media/sounds/minecraft-cat.mp3" },
-      { n: "Minecraft Door", u: "https://www.myinstants.com/media/sounds/minecraft-door.mp3" },
-      { n: "Minecraft Chest", u: "https://www.myinstants.com/media/sounds/minecraft-chest.mp3" },
-      { n: "Minecraft Eat", u: "https://www.myinstants.com/media/sounds/minecraft-eat.mp3" },
-      { n: "Minecraft Drink", u: "https://www.myinstants.com/media/sounds/minecraft-drink.mp3" },
-      { n: "Minecraft Break", u: "https://www.myinstants.com/media/sounds/minecraft-break.mp3" },
-      { n: "Minecraft Place", u: "https://www.myinstants.com/media/sounds/minecraft-place.mp3" },
-      { n: "Minecraft Level Up", u: "https://www.myinstants.com/media/sounds/minecraft-level-up.mp3" },
-      { n: "Minecraft XP", u: "https://www.myinstants.com/media/sounds/minecraft-xp.mp3" },
-      { n: "CSGO Headshot", u: "https://www.myinstants.com/media/sounds/csgo-headshot.mp3" },
-      { n: "Bomb Planted", u: "https://www.myinstants.com/media/sounds/bomb-planted.mp3" },
-      { n: "Bomb Defused", u: "https://www.myinstants.com/media/sounds/bomb-defused.mp3" },
-      { n: "Terrorists Win", u: "https://www.myinstants.com/media/sounds/terrorists-win.mp3" },
-      { n: "Counter-Terrorists Win", u: "https://www.myinstants.com/media/sounds/counter-terrorists-win.mp3" },
-      { n: "Rush B", u: "https://www.myinstants.com/media/sounds/rush-b.mp3" },
-      { n: "Cyka Blyat", u: "https://www.myinstants.com/media/sounds/cyka-blyat.mp3" },
-      { n: "Cheeki Breeki", u: "https://www.myinstants.com/media/sounds/cheeki-breeki.mp3" },
-      { n: "Hardbass", u: "https://www.myinstants.com/media/sounds/hardbass.mp3" },
-      { n: "Hitmarker", u: "https://www.myinstants.com/media/sounds/hitmarker.mp3" },
-      { n: "Tactical Nuke", u: "https://www.myinstants.com/media/sounds/tactical-nuke.mp3" },
-      { n: "AC130 Above", u: "https://www.myinstants.com/media/sounds/ac130-above.mp3" },
-      { n: "UAV Online", u: "https://www.myinstants.com/media/sounds/uav-online.mp3" },
-      { n: "Troll Song", u: "https://www.myinstants.com/media/sounds/troll-song.mp3" },
-      { n: "Keyboard Cat", u: "https://www.myinstants.com/media/sounds/keyboard-cat.mp3" },
-      { n: "Numa Numa", u: "https://www.myinstants.com/media/sounds/numa-numa.mp3" },
-      { n: "Epic Sax Guy", u: "https://www.myinstants.com/media/sounds/epic-sax-guy.mp3" },
-      { n: "Darude Sandstorm", u: "https://www.myinstants.com/media/sounds/darude-sandstorm.mp3" },
-      { n: "Nyan Cat", u: "https://www.myinstants.com/media/sounds/nyan-cat.mp3" },
-      { n: "Shooting Stars", u: "https://www.myinstants.com/media/sounds/shooting-stars.mp3" },
-      { n: "All Star", u: "https://www.myinstants.com/media/sounds/all-star.mp3" },
-      { n: "Somebody Toucha", u: "https://www.myinstants.com/media/sounds/somebody-toucha-my-spaghet.mp3" },
-      { n: "Spaghet", u: "https://www.myinstants.com/media/sounds/spaghet.mp3" },
-      { n: "Do U Know Da Wae", u: "https://www.myinstants.com/media/sounds/do-u-know-da-wae.mp3" },
-      { n: "Ugandan Knuckles", u: "https://www.myinstants.com/media/sounds/ugandan-knuckles.mp3" },
-      { n: "Clicking", u: "https://www.myinstants.com/media/sounds/clicking.mp3" },
-      { n: "We Are Number One", u: "https://www.myinstants.com/media/sounds/we-are-number-one.mp3" },
-      { n: "Gabe the Dog", u: "https://www.myinstants.com/media/sounds/gabe-the-dog.mp3" },
-      { n: "Bork", u: "https://www.myinstants.com/media/sounds/bork.mp3" },
-      { n: "Pacha Just Right", u: "https://www.myinstants.com/media/sounds/pacha-just-right.mp3" },
-      { n: "Pepe", u: "https://www.myinstants.com/media/sounds/pepe.mp3" },
-      { n: "REEEEE", u: "https://www.myinstants.com/media/sounds/reeeee.mp3" },
-      { n: "Omae Wa", u: "https://www.myinstants.com/media/sounds/omae-wa.mp3" },
-      { n: "Shindeiru", u: "https://www.myinstants.com/media/sounds/shindeiru.mp3" },
-      { n: "No God Please No", u: "https://www.myinstants.com/media/sounds/no-god-please-no.mp3" },
-      { n: "That's What She Said", u: "https://www.myinstants.com/media/sounds/thats-what-she-said.mp3" },
-      { n: "Bears Beets", u: "https://www.myinstants.com/media/sounds/bears-beets-battlestar-galactica.mp3" },
-      { n: "Parkour", u: "https://www.myinstants.com/media/sounds/parkour.mp3" },
-      { n: "I Am Speed", u: "https://www.myinstants.com/media/sounds/i-am-speed.mp3" },
-      { n: "Kachow", u: "https://www.myinstants.com/media/sounds/kachow.mp3" },
-      { n: "To Infinity", u: "https://www.myinstants.com/media/sounds/to-infinity.mp3" },
-      { n: "And Beyond", u: "https://www.myinstants.com/media/sounds/and-beyond.mp3" },
-      { n: "You're a Toy", u: "https://www.myinstants.com/media/sounds/youre-a-toy.mp3" },
-      { n: "Shrek Roar", u: "https://www.myinstants.com/media/sounds/shrek-roar.mp3" },
-      { n: "Donkey", u: "https://www.myinstants.com/media/sounds/donkey.mp3" },
-      { n: "Get Out of My Swamp", u: "https://www.myinstants.com/media/sounds/get-out-of-my-swamp.mp3" },
-      { n: "Onions Have Layers", u: "https://www.myinstants.com/media/sounds/onions-have-layers.mp3" },
-      { n: "SomeBODY", u: "https://www.myinstants.com/media/sounds/somebody.mp3" },
-      { n: "Once Told Me", u: "https://www.myinstants.com/media/sounds/once-told-me.mp3" },
-      { n: "The World is Gonna", u: "https://www.myinstants.com/media/sounds/the-world-is-gonna.mp3" }
-    ];
-
-    const board = document.getElementById('board');
-    const srch = document.getElementById('srch');
-
-    const render = (q) => {
-      board.innerHTML = '';
-      const f = sounds.filter(s => s.n.toLowerCase().includes(q.toLowerCase()));
-      if (f.length === 0) {
-        board.innerHTML = '<div class="no-res">No sounds found.</div>';
-        return;
-      }
-      f.forEach(s => {
-        const b = document.createElement('button');
-        b.className = 'snd-btn';
-        b.innerText = s.n;
-        b.onclick = () => {
-          const a = new Audio(s.u);
-          a.play().catch(e => console.log('Audio error:', e));
-        };
-        board.appendChild(b);
-      });
-    };
-
-    srch.addEventListener('input', e => render(e.target.value));
-    render(''); // init
-  <\/script>
-</body>
-</html>`;
-
     function launchApp(type) {
       const modal = $('sys-modal');
       const frame = $('app-frame');
@@ -633,14 +306,24 @@
       } else if (type === 'apk') {
         title.innerText = "APK Opener";
         frame.srcdoc = tplAPK;
-      } else if (type === 'sound') {
-        title.innerText = "Master Soundboard";
-        frame.srcdoc = tplSound;
       }
       modal.style.display = 'flex';
     }
 
+    function toggleFS() {
+      // Now targets only the iframe element
+      const frame = $('app-frame');
+      if (!document.fullscreenElement) {
+        frame.requestFullscreen().catch(err => console.log(err));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
     function closeApp() {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
       $('sys-modal').style.display = 'none';
       $('app-frame').srcdoc = '';
     }
