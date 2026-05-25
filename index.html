@@ -15,7 +15,6 @@
       height: 100vh;
     }
 
-    /* Basic Inputs and Buttons */
     input {
       width: 100%;
       padding: 10px;
@@ -52,7 +51,6 @@
       font-size: 12px;
     }
 
-    /* Overlays and Panels */
     .overlay {
       position: fixed;
       inset: 0;
@@ -90,7 +88,6 @@
       display: block;
     }
 
-    /* Navigation and Layout */
     .top-nav {
       background-color: #1e1e1e;
       border-bottom: 1px solid #333;
@@ -119,7 +116,6 @@
       text-align: center;
     }
 
-    /* Logs and Results */
     .log-table {
       width: 100%;
       border-collapse: collapse;
@@ -143,7 +139,6 @@
       margin-top: 10px;
     }
 
-    /* Fullscreen Modal */
     #sys-modal { padding-top: 0; }
     .modal-head {
       background-color: #222;
@@ -180,8 +175,8 @@
   <div id="lock-screen" class="overlay">
     <div class="panel" style="max-width: 400px;">
       <h2>Admin Login</h2>
-      <input type="email" id="adm-email" placeholder="Email Address">
-      <input type="password" id="adm-pass" placeholder="Password">
+      <input type="email" id="adm-email" placeholder="Admin Email Address">
+      <input type="password" id="adm-pass" placeholder="Admin Password">
       <button class="btn-blue" onclick="loginAdmin()">Login</button>
       <div id="admin-login-error" style="color: #dc3545; font-size: 13px; margin-top: 10px; text-align: center;"></div>
       <div style="text-align: center; margin-top: 15px;">
@@ -197,25 +192,25 @@
         <button class="btn-gray sm-btn" onclick="logoutAdmin()">Logout</button>
       </div>
 
-      <span class="section-label">Live Game Site Visitors</span>
-      <button class="btn-gray sm-btn" style="margin-bottom: 10px;" onclick="refreshVisitorLog()">Refresh Logs</button>
+      <span class="section-label">Active Game Site Accounts</span>
+      <button class="btn-gray sm-btn" style="margin-bottom: 10px;" onclick="refreshVisitorLog()">Refresh Roster</button>
       <table class="log-table">
         <thead>
           <tr>
-            <th>Identity / Email</th>
-            <th>IP Address</th>
+            <th>User Account (Email)</th>
+            <th>Last Known IP</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody id="visitor-log-rows">
-          <tr><td colspan="3" style="text-align:center; color:#888;">No recent visitors found.</td></tr>
+          <tr><td colspan="3" style="text-align:center; color:#888;">No active users found.</td></tr>
         </tbody>
       </table>
       
-      <span class="section-label">Manual Ban Control</span>
+      <span class="section-label">Manual Access Control</span>
       <div style="display: flex; gap: 10px;">
         <div style="flex: 1;">
-          <input type="text" id="ban-user-email" placeholder="Enter Identity, IP, or Email to Ban">
+          <input type="text" id="ban-user-email" placeholder="Enter Account Email or IP to Ban">
           <button class="btn-red" onclick="executeBan(true)">Ban Target</button>
         </div>
         <div style="flex: 1;">
@@ -223,11 +218,6 @@
           <button class="btn-green" onclick="executeBan(false)">Unban Target</button>
         </div>
       </div>
-
-      <span class="section-label">Identity Token Link Generator</span>
-      <input type="email" id="target-user-email" placeholder="User's Email Address">
-      <button class="btn-blue" onclick="generateUserLink()">Generate Identity Link</button>
-      <div id="link-result" class="result-box" style="display:none;"></div>
 
       <span class="section-label">Authorize New Admin</span>
       <input type="email" id="new-admin-email" placeholder="New Admin Email Address">
@@ -310,18 +300,16 @@
           const tbody = $('visitor-log-rows');
           tbody.innerHTML = "";
           if (data.visitors.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">No recent visitors found.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">No active users found.</td></tr>`;
             return;
           }
           data.visitors.forEach(v => {
             const tr = document.createElement('tr');
-            const identityDisplay = v.email !== "Anonymous Guest" ? `${v.email} (${v.deviceId})` : v.deviceId;
             tr.innerHTML = `
-              <td>${identityDisplay}</td>
+              <td style="font-weight:bold;">${v.email}</td>
               <td>${v.ip}</td>
               <td>
-                <button class="btn-red sm-btn" onclick="quickBan('${v.deviceId}')">Ban ID</button>
-                <button class="btn-red sm-btn" onclick="quickBan('${v.ip}')">Ban IP</button>
+                <button class="btn-red sm-btn" onclick="quickBan('${v.email}')">Ban Account</button>
               </td>
             `;
             tbody.appendChild(tr);
@@ -339,39 +327,10 @@
         });
         const data = await response.json();
         if (response.ok && data.success) {
-          if (data.linked) {
-            alert(`Targeted matching device and IP addresses blacklisted.`);
-          } else {
-            alert(`MANUAL TARGET APPLIED: ${target} added to database.`);
-          }
+          alert(`Successfully Banned: ${target}`);
           refreshVisitorLog();
         }
       } catch(e){}
-    }
-
-    async function generateUserLink() {
-      const targetEmail = $('target-user-email').value;
-      const resBox = $('link-result');
-      resBox.style.display = "none";
-
-      try {
-        const response = await fetch(`${SERVER_URL}/admin/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ adminEmail: cachedAdminEmail, secret: cachedAdminSecret, targetEmail: targetEmail })
-        });
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          const gameSiteBaseUrl = window.location.href.replace('imgui-tools.html', 'index.html').split('?')[0];
-          resBox.innerText = `${gameSiteBaseUrl}?code=${data.code}`;
-          resBox.style.display = "block";
-        } else {
-          alert(data.error || "Failed to generate link.");
-        }
-      } catch (err) {
-        alert("Server communication error.");
-      }
     }
 
     async function executeBan(shouldBan) {
@@ -387,11 +346,7 @@
         });
         const data = await response.json();
         if (response.ok && data.success) {
-          if (shouldBan && data.linked) {
-             alert(`SUCCESS: Target session identified. Matching Device ID and IP address fully blacklisted.`);
-          } else {
-             alert(`Operation successful for: ${targetInput.value}`);
-          }
+          alert(`Operation successful for: ${targetInput.value}`);
           targetInput.value = "";
           refreshVisitorLog();
         } else {
