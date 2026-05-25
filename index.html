@@ -211,28 +211,47 @@
       background: transparent;
     }
 
-    .adm-section {
+    #admin-menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 5, 20, 0.9);
+      z-index: 10000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .admin-panel-box {
+      background: #111;
+      border: 2px solid #a855f7;
+      padding: 40px;
+      border-radius: 16px;
       width: 100%;
-      text-align: left;
-      border-top: 1px solid #333;
-      margin-top: 15px;
-      padding-top: 15px;
+      max-width: 500px;
+      box-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
+    }
+    .adm-section {
+      border-top: 1px solid #222;
+      margin-top: 20px;
+      padding-top: 20px;
     }
     .adm-lbl {
       font-size: 12px;
       color: #a855f7;
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
       display: block;
+      text-transform: uppercase;
     }
     .result-box {
-      background: #222;
+      background: #1a1a1a;
       border: 1px dashed #a855f7;
       padding: 10px;
       margin-top: 10px;
-      font-size: 11px;
+      font-size: 12px;
       word-break: break-all;
       user-select: all;
+      color: #22c55e;
     }
   </style>
 </head>
@@ -255,20 +274,12 @@
     </div>
   </div>
 
-  <div id="particles-js"></div>
-  <div class="hero-shape"></div>
-
-  <div class="top-nav"></div>
-
-  <div class="main-wrap">
-    <div class="menu-box" id="normal-menu">
-      <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png?ex=6a1492ff&is=6a13417f&hm=f4a9b4310ce48c88fe8b0a727ee691107e857ddd02e743ded396e53e448b5e8c&=&format=webp&quality=lossless&width=362&height=242" alt="GUI Logo" class="brand-logo">
-      <button class="btn" onclick="launchApp('html')">Open HTML Editor</button>
-      <button class="btn" onclick="launchApp('apk')">Open APK Editor</button>
-    </div>
-
-    <div class="menu-box" id="admin-menu" style="display:none;">
-      <h2 class="lock-title">Admin Control Panel</h2>
+  <div id="admin-menu-overlay" style="display: none;">
+    <div class="admin-panel-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h2 class="lock-title" style="margin:0;">Control Panel</h2>
+        <button class="admin-btn" style="width:auto; margin:0; padding: 5px 15px; background:#ef4444;" onclick="logoutAdmin()">Exit Portal</button>
+      </div>
       
       <div class="adm-section">
         <label class="adm-lbl">Generate Single-Use Link</label>
@@ -278,11 +289,38 @@
       </div>
 
       <div class="adm-section">
+        <label class="adm-lbl">Ban User Across All Sites</label>
+        <input type="email" id="ban-user-email" class="admin-input" placeholder="Target Email to Ban">
+        <button class="admin-btn" style="background:#ef4444;" onclick="executeBan(true)">Ban Email Address</button>
+      </div>
+
+      <div class="adm-section">
+        <label class="adm-lbl">Unban User Access</label>
+        <input type="email" id="unban-user-email" class="admin-input" placeholder="Target Email to Unban">
+        <button class="admin-btn" style="background:#22c55e;" onclick="executeBan(false)">Unban Email Address</button>
+      </div>
+
+      <div class="adm-section">
         <label class="adm-lbl">Authorize New Admin Email</label>
         <input type="email" id="new-admin-email" class="admin-input" placeholder="New Admin Email Address">
-        <button class="admin-btn" style="background:#22c55e;" onclick="addNewAdmin()">Authorize Admin</button>
+        <button class="admin-btn" style="background:#eab308; color:#000;" onclick="addNewAdmin()">Authorize Admin</button>
         <div id="admin-result" style="font-size:13px; margin-top:5px; text-align:center;"></div>
       </div>
+    </div>
+  </div>
+
+  <div id="particles-js"></div>
+  <div class="hero-shape"></div>
+
+  <div class="top-nav">
+    <button class="btn" style="width:auto; position:absolute; right:15px; top:8px; padding:7px 20px;" onclick="openAdminPanelDirectly()">Admin Menu</button>
+  </div>
+
+  <div class="main-wrap">
+    <div class="menu-box">
+      <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png?ex=6a1492ff&is=6a13417f&hm=f4a9b4310ce48c88fe8b0a727ee691107e857ddd02e743ded396e53e448b5e8c&=&format=webp&quality=lossless&width=362&height=242" alt="GUI Logo" class="brand-logo">
+      <button class="btn" onclick="launchApp('html')">Open HTML Editor</button>
+      <button class="btn" onclick="launchApp('apk')">Open APK Editor</button>
     </div>
   </div>
 
@@ -303,6 +341,28 @@
     let cachedAdminSecret = "";
 
     window.addEventListener('DOMContentLoaded', async () => {
+      const storedEmail = localStorage.getItem('imgui_user_email');
+      if (storedEmail) {
+        try {
+          const checkRes = await fetch('http://localhost:3000/check-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: storedEmail })
+          });
+          const statusData = await checkRes.json();
+          if (statusData.banned) {
+            localStorage.removeItem('imgui_user_email');
+            $('status-message').innerHTML = "<span style='color:#ef4444;'>Your permanent access has been revoked/banned.</span>";
+            return;
+          }
+          $('lock-screen').remove();
+          return;
+        } catch (e) {
+          $('lock-screen').remove();
+          return;
+        }
+      }
+
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
       const statusText = $('status-message');
@@ -323,6 +383,7 @@
 
         if (response.ok && data.success) {
           statusText.innerHTML = `<span style='color:#22c55e;'>Access Granted!<br>Welcome, ${data.email}</span>`;
+          localStorage.setItem('imgui_user_email', data.email);
           window.history.replaceState({}, document.title, window.location.pathname);
           setTimeout(() => { $('lock-screen').remove(); }, 1200);
         } else {
@@ -347,7 +408,6 @@
       const email = $('adm-email').value;
       const secret = $('adm-pass').value;
       const errorDiv = $('admin-login-error');
-
       errorDiv.innerText = "";
 
       try {
@@ -361,14 +421,31 @@
         if (response.ok && data.success) {
           cachedAdminEmail = email;
           cachedAdminSecret = secret;
-          $('normal-menu').style.display = 'none';
-          $('admin-menu').style.display = 'flex';
-          $('lock-screen').remove();
+          $('lock-screen').style.display = 'none';
+          $('admin-menu-overlay').style.display = 'flex';
         } else {
           errorDiv.innerText = data.error || "Login failed.";
         }
       } catch (err) {
         errorDiv.innerText = "Error connecting to server.";
+      }
+    }
+
+    function openAdminPanelDirectly() {
+      if (cachedAdminEmail && cachedAdminSecret) {
+        $('admin-menu-overlay').style.display = 'flex';
+      } else {
+        document.body.appendChild($('lock-screen'));
+        $('lock-screen').style.display = 'flex';
+        switchMode('admin');
+      }
+    }
+
+    function logoutAdmin() {
+      $('admin-menu-overlay').style.display = 'none';
+      if (!localStorage.getItem('imgui_user_email')) {
+        $('lock-screen').style.display = 'flex';
+        switchMode('user');
       }
     }
 
@@ -397,6 +474,34 @@
           alert(data.error || "Failed to generate link.");
         }
       } catch (err) {
+        alert("Server communication error.");
+      }
+    }
+
+    async function executeBan(shouldBan) {
+      const targetInput = shouldBan ? $('ban-user-email') : $('unban-user-email');
+      const endpoint = shouldBan ? 'ban' : 'unban';
+      
+      if (!targetInput.value) return alert("Please specify an email address.");
+
+      try {
+        const response = await fetch(`http://localhost:3000/admin/${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            adminEmail: cachedAdminEmail,
+            secret: cachedAdminSecret,
+            [shouldBan ? 'banEmail' : 'unbanEmail']: targetInput.value
+          })
+        });
+        const data = await response.json();
+        if (response.ok && data.success) {
+          alert(`Successfully ${shouldBan ? 'banned' : 'unbanned'} ${targetInput.value}`);
+          targetInput.value = "";
+        } else {
+          alert(data.error || "Operation failed.");
+        }
+      } catch (e) {
         alert("Server communication error.");
       }
     }
