@@ -14,12 +14,88 @@
       flex-flow: column nowrap;
       height: 100vh;
       overflow: hidden; 
+      position: relative;
+    }
+
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0a;
+      z-index: 100000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .lock-box {
+      background: #111;
+      border: 2px solid #333;
+      padding: 40px;
+      border-radius: 12px;
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 30px rgba(168, 85, 247, 0.2);
+      box-sizing: border-box;
+    }
+    .lock-title { color: #a855f7; margin-top: 0; }
+    .status-msg { margin: 20px 0; color: #aaa; font-size: 14px; }
+
+    .admin-input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      background: #222;
+      border: 1px solid #444;
+      color: #fff;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .admin-btn {
+      background: #a855f7;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .admin-btn:hover { background: #9333ea; }
+    .switch-lnk {
+      color: #3b82f6;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-block;
+      margin-top: 15px;
+      text-decoration: underline;
     }
 
     #particles-js {
       position: absolute;
       inset: 0;
       z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-shape {
+      position: absolute;
+      width: 750px;
+      height: 750px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1; 
+      pointer-events: none; 
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(0,0,0,0) 70%);
+      animation: spin 15s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
     }
 
     .top-nav {
@@ -39,24 +115,7 @@
       padding: 20px;
       box-sizing: border-box;
       position: relative;
-      z-index: 1;
-    }
-
-    .hero-shape {
-      position: absolute;
-      width: 750px;
-      height: 750px;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 1; 
-      pointer-events: none; 
-      animation: spin 15s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: translate(-50%, -50%) rotate(0deg); }
-      100% { transform: translate(-50%, -50%) rotate(360deg); }
+      z-index: 2;
     }
 
     .menu-box {
@@ -72,7 +131,6 @@
       gap: 15px;
       box-sizing: border-box;
       backdrop-filter: blur(6px); 
-      z-index: 2; 
     }
 
     .brand-logo {
@@ -96,9 +154,7 @@
       transition: 0.2s;
     }
 
-    .btn:hover {
-      background: #444;
-    }
+    .btn:hover { background: #444; }
 
     .modal-wrapper {
       display: none; 
@@ -125,10 +181,7 @@
       color: #a855f7;
     }
 
-    .head-actions {
-      display: flex;
-      gap: 10px;
-    }
+    .head-actions { display: flex; gap: 10px; }
 
     .btn-fs {
       background: #3b82f6; 
@@ -154,29 +207,82 @@
 
     #app-frame {
       flex-grow: 1;
-      width: 100%;
       border: none;
-      background: #fff;
+      background: transparent;
+    }
+
+    .adm-section {
+      width: 100%;
+      text-align: left;
+      border-top: 1px solid #333;
+      margin-top: 15px;
+      padding-top: 15px;
+    }
+    .adm-lbl {
+      font-size: 12px;
+      color: #a855f7;
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+    }
+    .result-box {
+      background: #222;
+      border: 1px dashed #a855f7;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 11px;
+      word-break: break-all;
+      user-select: all;
     }
   </style>
 </head>
 <body>
 
+  <div id="lock-screen">
+    <div class="lock-box" id="mode-user">
+      <h2 class="lock-title">Access Restricted</h2>
+      <div id="status-message" class="status-msg">Verifying 1-time authorization token...</div>
+      <div class="switch-lnk" onclick="switchMode('admin')">Access Admin Portal</div>
+    </div>
+
+    <div class="lock-box" id="mode-admin" style="display:none;">
+      <h2 class="lock-title">Admin Portal</h2>
+      <input type="email" id="adm-email" class="admin-input" placeholder="Your Admin Email">
+      <input type="password" id="adm-pass" class="admin-input" placeholder="Master Password">
+      <button class="admin-btn" onclick="loginAdmin()">Login to Dashboard</button>
+      <div id="admin-login-error" style="color:#ef4444; font-size:13px; margin-top:10px;"></div>
+      <div class="switch-lnk" onclick="switchMode('user')">Back to Validation Screen</div>
+    </div>
+  </div>
+
   <div id="particles-js"></div>
+  <div class="hero-shape"></div>
+
   <div class="top-nav"></div>
 
   <div class="main-wrap">
-    <svg class="hero-shape" viewBox="0 0 100 100">
-      <polygon points="50,15 15,85 85,85" fill="none" stroke="#fff" stroke-width="0.1" stroke-linejoin="round" />
-      <circle cx="50" cy="15" r="2.5" fill="#a855f7" /> 
-      <circle cx="15" cy="85" r="2.5" fill="#22c55e" /> 
-      <circle cx="85" cy="85" r="2.5" fill="#3b82f6" /> 
-    </svg>
-
-    <div class="menu-box">
-      <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png?ex=6a13417f&is=6a11efff&hm=06353bd88304c09a2d1f95d2387da0a191387a7f39c3ea2079486ca0f4ce0da8&=&format=webp&quality=lossless&width=362&height=242" alt="GUI Logo" class="brand-logo">
+    <div class="menu-box" id="normal-menu">
+      <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png?ex=6a1492ff&is=6a13417f&hm=f4a9b4310ce48c88fe8b0a727ee691107e857ddd02e743ded396e53e448b5e8c&=&format=webp&quality=lossless&width=362&height=242" alt="GUI Logo" class="brand-logo">
       <button class="btn" onclick="launchApp('html')">Open HTML Editor</button>
       <button class="btn" onclick="launchApp('apk')">Open APK Editor</button>
+    </div>
+
+    <div class="menu-box" id="admin-menu" style="display:none;">
+      <h2 class="lock-title">Admin Control Panel</h2>
+      
+      <div class="adm-section">
+        <label class="adm-lbl">Generate Single-Use Link</label>
+        <input type="email" id="target-user-email" class="admin-input" placeholder="User's Email Address">
+        <button class="admin-btn" style="background:#3b82f6;" onclick="generateUserLink()">Generate Access Link</button>
+        <div id="link-result" class="result-box" style="display:none;"></div>
+      </div>
+
+      <div class="adm-section">
+        <label class="adm-lbl">Authorize New Admin Email</label>
+        <input type="email" id="new-admin-email" class="admin-input" placeholder="New Admin Email Address">
+        <button class="admin-btn" style="background:#22c55e;" onclick="addNewAdmin()">Authorize Admin</button>
+        <div id="admin-result" style="font-size:13px; margin-top:5px; text-align:center;"></div>
+      </div>
     </div>
   </div>
 
@@ -188,120 +294,151 @@
         <button class="btn-close" onclick="closeApp()">Close App</button>
       </div>
     </div>
-    <iframe id="app-frame" allowfullscreen></iframe>
+    <iframe id="app-frame"></iframe>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <script>
     const $ = id => document.getElementById(id);
+    let cachedAdminEmail = "";
+    let cachedAdminSecret = "";
 
-    particlesJS("particles-js", {
-      particles: {
-        number: { value: 60, density: { enable: true, value_area: 800 } },
-        color: { value: "#fff" },
-        shape: { type: "circle" },
-        opacity: { value: 0.5 },
-        size: { value: 3, random: true },
-        line_linked: { enable: true, distance: 150, color: "#fff", opacity: 0.3, width: 1 },
-        move: { enable: true, speed: 2, out_mode: "out" }
-      },
-      interactivity: {
-        detect_on: "canvas",
-        events: { onhover: { enable: true, mode: "grab" }, onclick: { enable: true, mode: "push" }, resize: true },
-        modes: { grab: { distance: 140, line_linked: { opacity: 1 } }, push: { particles_nb: 4 } }
-      },
-      retina_detect: true
+    window.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const statusText = $('status-message');
+
+      if (!code) {
+        statusText.innerHTML = "<span style='color:#ef4444;'>Error: No access code detected.<br>You must use an official single-use generation link.</span>";
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: code })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          statusText.innerHTML = `<span style='color:#22c55e;'>Access Granted!<br>Welcome, ${data.email}</span>`;
+          window.history.replaceState({}, document.title, window.location.pathname);
+          setTimeout(() => { $('lock-screen').remove(); }, 1200);
+        } else {
+          statusText.innerHTML = `<span style='color:#ef4444;'>Access Denied:<br>${data.error || 'Invalid Link Code'}</span>`;
+        }
+      } catch (err) {
+        statusText.innerHTML = "<span style='color:#ef4444;'>Error connecting to validation servers. Please try again later.</span>";
+      }
     });
 
-    const tplHTML = `<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { margin: 0; background: #0f0f0f; color: #fff; font-family: sans-serif; display: flex; height: 100vh; overflow: hidden; }
-    .col { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #333; }
-    .col:last-child { border: none; }
-    .head { background: #222; padding: 8px 15px; font-size: 14px; font-weight: bold; border-bottom: 1px solid #333; }
-    textarea { flex: 1; background: #111; color: #e0e0e0; font-family: monospace; padding: 15px; border: none; resize: none; outline: none; }
-    iframe { flex: 1; border: none; background: #fff; }
-  </style>
-</head>
-<body>
-  <div class="col">
-    <div class="head">Code</div>
-    <textarea id="src" spellcheck="false">&lt;h1 style="color:#22c55e"&gt;Hello World!&lt;/h1&gt;</textarea>
-  </div>
-  <div class="col">
-    <div class="head">Preview</div>
-    <iframe id="view" allowfullscreen></iframe>
-  </div>
-  <script>
-    const s = document.getElementById('src'), v = document.getElementById('view');
-    const update = () => {
-      const doc = v.contentDocument || v.contentWindow.document;
-      doc.open(); doc.write(s.value); doc.close();
-    };
-    s.addEventListener('input', update);
-    update();
-  <\/script>
-</body>
-</html>`;
+    function switchMode(mode) {
+      if (mode === 'admin') {
+        $('mode-user').style.display = 'none';
+        $('mode-admin').style.display = 'block';
+      } else {
+        $('mode-admin').style.display = 'none';
+        $('mode-user').style.display = 'block';
+      }
+    }
 
-    const tplAPK = `<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { margin: 0; background: #0f0f0f; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-    .bar { background: #1a1a1a; padding: 10px 20px; border-bottom: 1px solid #333; display: flex; gap: 15px; align-items: center; }
-    .btn { background: #a855f7; color: #fff; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; }
-    input[type="file"] { display: none; }
-    .wrap { display: flex; flex: 1; }
-    .side { width: 250px; background: #111; border-right: 2px solid #333; }
-    .title { background: #222; padding: 8px 15px; font-size: 14px; font-weight: bold; }
-    ul { list-style: none; padding: 10px; margin: 0; font-family: monospace; font-size: 14px; display: none; }
-    li { padding: 5px 0; cursor: pointer; color: #ccc; }
-    li:hover { color: #a855f7; }
-    textarea { flex: 1; background: #0a0a0a; color: #eee; font-family: monospace; padding: 15px; border: none; outline: none; resize: none; }
-  </style>
-</head>
-<body>
-  <div class="bar">
-    <label class="btn">Open APK <input type="file" id="up" accept=".apk"></label>
-    <span id="msg">Waiting...</span>
-  </div>
-  <div class="wrap">
-    <div class="side">
-      <div class="title">Files</div>
-      <ul id="tree">
-        <li>/res/</li>
-        <li>/smali/</li>
-        <li>AndroidManifest.xml</li>
-        <li>classes.dex</li>
-      </ul>
-    </div>
-    <textarea id="code" readonly>Upload APK...</textarea>
-  </div>
-  <script>
-    document.getElementById('up').addEventListener('change', e => {
-      if(!e.target.files.length) return;
-      document.getElementById('msg').innerText = 'Extracting ' + e.target.files[0].name;
-      document.getElementById('code').value = 'Analyzing structure...';
-      setTimeout(() => {
-        document.getElementById('msg').innerText = 'Loaded.';
-        document.getElementById('tree').style.display = 'block';
-        document.getElementById('code').value = '// APK decompiled.\\n// Select files from left to edit.';
-      }, 1000);
-    });
-  <\/script>
-</body>
-</html>`;
+    async function loginAdmin() {
+      const email = $('adm-email').value;
+      const secret = $('adm-pass').value;
+      const errorDiv = $('admin-login-error');
+
+      errorDiv.innerText = "";
+
+      try {
+        const response = await fetch('http://localhost:3000/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, secret })
+        });
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          cachedAdminEmail = email;
+          cachedAdminSecret = secret;
+          $('normal-menu').style.display = 'none';
+          $('admin-menu').style.display = 'flex';
+          $('lock-screen').remove();
+        } else {
+          errorDiv.innerText = data.error || "Login failed.";
+        }
+      } catch (err) {
+        errorDiv.innerText = "Error connecting to server.";
+      }
+    }
+
+    async function generateUserLink() {
+      const targetEmail = $('target-user-email').value;
+      const resBox = $('link-result');
+      resBox.style.display = "none";
+
+      try {
+        const response = await fetch('http://localhost:3000/admin/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            adminEmail: cachedAdminEmail,
+            secret: cachedAdminSecret,
+            targetEmail: targetEmail
+          })
+        });
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          const generatedLink = `${window.location.origin}${window.location.pathname}?code=${data.code}`;
+          resBox.innerText = generatedLink;
+          resBox.style.display = "block";
+        } else {
+          alert(data.error || "Failed to generate link.");
+        }
+      } catch (err) {
+        alert("Server communication error.");
+      }
+    }
+
+    async function addNewAdmin() {
+      const newAdminEmail = $('new-admin-email').value;
+      const resDiv = $('admin-result');
+      resDiv.innerText = "";
+
+      try {
+        const response = await fetch('http://localhost:3000/admin/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            adminEmail: cachedAdminEmail,
+            secret: cachedAdminSecret,
+            newAdminEmail: newAdminEmail
+          })
+        });
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          resDiv.innerHTML = "<span style='color:#22c55e;'>Admin authorized successfully!</span>";
+          $('new-admin-email').value = "";
+        } else {
+          resDiv.innerHTML = `<span style='color:#ef4444;'>${data.error || 'Failed to add admin.'}</span>`;
+        }
+      } catch (err) {
+        resDiv.innerHTML = "<span style='color:#ef4444;'>Server communication error.</span>";
+      }
+    }
+
+    const tplHTML = `<!DOCTYPE html><html><body style="background:#111;color:#fff;font-family:sans-serif;padding:20px;"><h2>HTML Editor Placeholder</h2></body></html>`;
+    const tplAPK = `<!DOCTYPE html><html><body style="background:#111;color:#fff;font-family:sans-serif;padding:20px;"><h2>APK Editor Placeholder</h2></body></html>`;
 
     function launchApp(type) {
       const modal = $('sys-modal');
-      const frame = $('app-frame');
       const title = $('m-title');
+      const frame = $('app-frame');
 
       if (type === 'html') {
-        title.innerText = "Live HTML Editor";
+        title.innerText = "HTML Editor";
         frame.srcdoc = tplHTML;
       } else if (type === 'apk') {
         title.innerText = "APK Opener";
@@ -312,27 +449,10 @@
 
     function toggleFS() {
       const frame = $('app-frame');
-      
-      try {
-       
-        const innerDoc = frame.contentDocument || frame.contentWindow.document;
-        const viewFrame = innerDoc.getElementById('view');
-        
-       
-        const targetElement = viewFrame ? viewFrame : frame;
-
-        if (!document.fullscreenElement) {
-          targetElement.requestFullscreen().catch(err => console.log(err));
-        } else {
-          document.exitFullscreen();
-        }
-      } catch (e) {
-        // Fallback just in case browser security blocks reading the iframe
-        if (!document.fullscreenElement) {
-          frame.requestFullscreen().catch(err => console.log(err));
-        } else {
-          document.exitFullscreen();
-        }
+      if (!document.fullscreenElement) {
+        frame.requestFullscreen().catch(err => console.log(err));
+      } else {
+        document.exitFullscreen();
       }
     }
 
