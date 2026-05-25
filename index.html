@@ -40,7 +40,6 @@
       box-sizing: border-box;
     }
     .lock-title { color: #a855f7; margin-top: 0; }
-    .status-msg { margin: 20px 0; color: #aaa; font-size: 14px; }
 
     .admin-input {
       width: 100%;
@@ -224,16 +223,18 @@
     .admin-panel-box {
       background: #111;
       border: 2px solid #a855f7;
-      padding: 40px;
+      padding: 30px;
       border-radius: 16px;
       width: 100%;
-      max-width: 500px;
+      max-width: 600px;
       box-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
+      max-height: 90vh;
+      overflow-y: auto;
     }
     .adm-section {
       border-top: 1px solid #222;
-      margin-top: 20px;
-      padding-top: 20px;
+      margin-top: 15px;
+      padding-top: 15px;
     }
     .adm-lbl {
       font-size: 12px;
@@ -253,6 +254,29 @@
       user-select: all;
       color: #22c55e;
     }
+    .log-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+    .log-table th, .log-table td {
+      border: 1px solid #333;
+      padding: 6px;
+      text-align: left;
+    }
+    .log-table th { background: #1a1a1a; color: #a855f7; }
+    .sm-ban-btn {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: bold;
+    }
+    .sm-ban-btn:hover { background: #b91c1c; }
   </style>
 </head>
 <body>
@@ -261,7 +285,7 @@
     <div class="lock-box" id="mode-admin">
       <h2 class="lock-title">Admin Portal</h2>
       <input type="email" id="adm-email" class="admin-input" placeholder="Your Admin Email">
-      <input type="password" id="adm-pass" class="admin-input" placeholder="Master Password">
+      <input type="password" id="adm-pass" class="admin-input" placeholder="Your Private Password">
       <button class="admin-btn" onclick="loginAdmin()">Login to Dashboard</button>
       <div id="admin-login-error" style="color:#ef4444; font-size:13px; margin-top:10px;"></div>
       <div class="switch-lnk" onclick="closeAdminLogin()">Cancel</div>
@@ -274,31 +298,48 @@
         <h2 class="lock-title" style="margin:0;">Control Panel</h2>
         <button class="admin-btn" style="width:auto; margin:0; padding: 5px 15px; background:#ef4444;" onclick="logoutAdmin()">Exit Portal</button>
       </div>
+
+      <div class="adm-section">
+        <label class="adm-lbl">Live Game Site Visitors (Click to Ban)</label>
+        <button class="admin-btn" style="background:#4b5563; margin-top:0; padding:4px 10px; width:auto; font-size:11px;" onclick="refreshVisitorLog()">Refresh Log</button>
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th>Device ID / Email</th>
+              <th>IP Address</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="visitor-log-rows">
+            <tr><td colspan="3" style="text-align:center; color:#888;">No recent visitors found.</td></tr>
+          </tbody>
+        </table>
+      </div>
       
       <div class="adm-section">
-        <label class="adm-lbl">Identity Token Link Generator (Tag User to Email)</label>
+        <label class="adm-lbl">Manual Ban Control (Email, IP, or Device ID)</label>
+        <input type="text" id="ban-user-email" class="admin-input" placeholder="Enter target to ban...">
+        <button class="admin-btn" style="background:#ef4444;" onclick="executeBan(true)">Issue Manual Ban</button>
+      </div>
+
+      <div class="adm-section">
+        <label class="adm-lbl">Unban Control</label>
+        <input type="text" id="unban-user-email" class="admin-input" placeholder="Enter target to unban...">
+        <button class="admin-btn" style="background:#22c55e;" onclick="executeBan(false)">Lift Manual Ban</button>
+      </div>
+
+      <div class="adm-section">
+        <label class="adm-lbl">Identity Token Link Generator (Optional Tagging)</label>
         <input type="email" id="target-user-email" class="admin-input" placeholder="User's Email Address">
         <button class="admin-btn" style="background:#3b82f6;" onclick="generateUserLink()">Generate Identity Link</button>
         <div id="link-result" class="result-box" style="display:none;"></div>
       </div>
 
       <div class="adm-section">
-        <label class="adm-lbl">Ban User (Locks Game Site If Token Match Found)</label>
-        <input type="email" id="ban-user-email" class="admin-input" placeholder="Target Email to Ban">
-        <button class="admin-btn" style="background:#ef4444;" onclick="executeBan(true)">Ban Email Address</button>
-      </div>
-
-      <div class="adm-section">
-        <label class="adm-lbl">Unban User Access</label>
-        <input type="email" id="unban-user-email" class="admin-input" placeholder="Target Email to Unban">
-        <button class="admin-btn" style="background:#22c55e;" onclick="executeBan(false)">Unban Email Address</button>
-      </div>
-
-      <div class="adm-section">
         <label class="adm-lbl">Authorize New Admin Email</label>
         <input type="email" id="new-admin-email" class="admin-input" placeholder="New Admin Email Address">
         <button class="admin-btn" style="background:#eab308; color:#000;" onclick="addNewAdmin()">Authorize Admin</button>
-        <div id="admin-result" style="font-size:13px; margin-top:5px; text-align:center;"></div>
+        <div id="admin-result" class="result-box" style="display:none; color:#eab308; border-color:#eab308;"></div>
       </div>
     </div>
   </div>
@@ -353,6 +394,7 @@
           cachedAdminSecret = secret;
           $('lock-screen').style.display = 'none';
           $('admin-menu-overlay').style.display = 'flex';
+          refreshVisitorLog();
         } else {
           errorDiv.innerText = data.error || "Login failed.";
         }
@@ -364,6 +406,7 @@
     function openAdminPanelDirectly() {
       if (cachedAdminEmail && cachedAdminSecret) {
         $('admin-menu-overlay').style.display = 'flex';
+        refreshVisitorLog();
       } else {
         $('lock-screen').style.display = 'flex';
       }
@@ -377,6 +420,56 @@
       $('admin-menu-overlay').style.display = 'none';
       cachedAdminEmail = "";
       cachedAdminSecret = "";
+    }
+
+    async function refreshVisitorLog() {
+      try {
+        const response = await fetch('http://localhost:3000/admin/visitors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminEmail: cachedAdminEmail, secret: cachedAdminSecret })
+        });
+        const data = await response.json();
+        if (response.ok && data.success) {
+          const tbody = $('visitor-log-rows');
+          tbody.innerHTML = "";
+          if (data.visitors.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">No recent visitors found.</td></tr>`;
+            return;
+          }
+          data.visitors.forEach(v => {
+            const tr = document.createElement('tr');
+            const identityDisplay = v.email !== "Anonymous Guest" ? `${v.email} (${v.deviceId})` : v.deviceId;
+            tr.innerHTML = `
+              <td>${identityDisplay}</td>
+              <td>${v.ip}</td>
+              <td>
+                <button class="sm-ban-btn" onclick="quickBan('${v.deviceId}')">Ban ID</button>
+                <button class="sm-ban-btn" style="margin-left:4px;" onclick="quickBan('${v.ip}')">Ban IP</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      } catch(e) {}
+    }
+
+    async function quickBan(target) {
+      try {
+        const response = await fetch(`http://localhost:3000/admin/ban`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            adminEmail: cachedAdminEmail,
+            secret: cachedAdminSecret,
+            banEmail: target
+          })
+        });
+        if (response.ok) {
+          alert(`Successfully banned: ${target}`);
+          refreshVisitorLog();
+        }
+      } catch(e){}
     }
 
     async function generateUserLink() {
@@ -413,7 +506,7 @@
       const targetInput = shouldBan ? $('ban-user-email') : $('unban-user-email');
       const endpoint = shouldBan ? 'ban' : 'unban';
       
-      if (!targetInput.value) return alert("Please specify an email address.");
+      if (!targetInput.value) return alert("Please specify a target value.");
 
       try {
         const response = await fetch(`http://localhost:3000/admin/${endpoint}`, {
@@ -427,8 +520,9 @@
         });
         const data = await response.json();
         if (response.ok && data.success) {
-          alert(`Successfully ${shouldBan ? 'banned' : 'unbanned'} ${targetInput.value}`);
+          alert(`Operation successful for: ${targetInput.value}`);
           targetInput.value = "";
+          refreshVisitorLog();
         } else {
           alert(data.error || "Operation failed.");
         }
@@ -440,6 +534,7 @@
     async function addNewAdmin() {
       const newAdminEmail = $('new-admin-email').value;
       const resDiv = $('admin-result');
+      resDiv.style.display = "none";
       resDiv.innerText = "";
 
       try {
@@ -455,13 +550,14 @@
         const data = await response.json();
 
         if (response.ok && data.success) {
-          resDiv.innerHTML = "<span style='color:#22c55e;'>Admin authorized successfully!</span>";
+          resDiv.innerHTML = `SUCCESS: Admin account created!<br>Email: ${newAdminEmail}<br>Generated Password: <strong style="color:#fff; background:#222; padding:2px 6px; border-radius:4px; user-select:all;">${data.password}</strong>`;
+          resDiv.style.display = "block";
           $('new-admin-email').value = "";
         } else {
-          resDiv.innerHTML = `<span style='color:#ef4444;'>${data.error || 'Failed to add admin.'}</span>`;
+          alert(data.error || 'Failed to add admin.');
         }
       } catch (err) {
-        resDiv.innerHTML = "<span style='color:#ef4444;'>Server communication error.</span>";
+        alert("Server communication error.");
       }
     }
 
