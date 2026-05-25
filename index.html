@@ -276,14 +276,14 @@
       </div>
       
       <div class="adm-section">
-        <label class="adm-lbl">Generate Single-Use Link (For Games Site)</label>
+        <label class="adm-lbl">Identity Token Link Generator (Tag User to Email)</label>
         <input type="email" id="target-user-email" class="admin-input" placeholder="User's Email Address">
-        <button class="admin-btn" style="background:#3b82f6;" onclick="generateUserLink()">Generate Access Link</button>
+        <button class="admin-btn" style="background:#3b82f6;" onclick="generateUserLink()">Generate Identity Link</button>
         <div id="link-result" class="result-box" style="display:none;"></div>
       </div>
 
       <div class="adm-section">
-        <label class="adm-lbl">Ban User Across All Sites</label>
+        <label class="adm-lbl">Ban User (Locks Game Site If Token Match Found)</label>
         <input type="email" id="ban-user-email" class="admin-input" placeholder="Target Email to Ban">
         <button class="admin-btn" style="background:#ef4444;" onclick="executeBan(true)">Ban Email Address</button>
       </div>
