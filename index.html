@@ -3,240 +3,245 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tools & Admin</title>
+  <title>imgui tools</title>
   <style>
-    :root {
-      --bg: #09090b;
-      --card: #18181b;
-      --border: #27272a;
-      --text: #f4f4f5;
-      --muted: #a1a1aa;
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --danger: #ef4444;
-      --success: #22c55e;
-    }
-
     body {
-      background: var(--bg);
-      color: var(--text);
+      background-color: #121212;
+      color: #e0e0e0;
       margin: 0;
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      overflow: hidden; 
     }
 
-    /* Clean Input Fields */
+    /* Basic Inputs and Buttons */
     input {
       width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 8px;
+      padding: 10px;
+      margin: 5px 0 15px 0;
+      background-color: #222;
+      border: 1px solid #444;
+      color: #fff;
       box-sizing: border-box;
-      font-family: inherit;
-      outline: none;
-      transition: border-color 0.2s;
+      font-family: Arial, sans-serif;
     }
-    input:focus { border-color: var(--primary); }
 
-    /* Clean Buttons */
     button {
-      font-family: inherit;
-      font-weight: 600;
+      padding: 10px 15px;
       border: none;
-      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-main {
-      background: var(--text);
-      color: var(--bg);
-      padding: 12px 24px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
       width: 100%;
     }
-    .btn-main:hover { background: #d4d4d8; transform: translateY(-1px); }
-    
-    .btn-blue { background: var(--primary); color: #fff; padding: 10px 16px; width: 100%; margin-top: 8px; }
-    .btn-blue:hover { background: var(--primary-hover); }
 
-    .btn-red { background: var(--danger); color: #fff; padding: 10px 16px; width: 100%; margin-top: 8px; }
-    .btn-red:hover { background: #dc2626; }
+    .btn-blue { background-color: #007bff; }
+    .btn-blue:hover { background-color: #0056b3; }
+    .btn-red { background-color: #dc3545; }
+    .btn-red:hover { background-color: #c82333; }
+    .btn-green { background-color: #28a745; }
+    .btn-green:hover { background-color: #218838; }
+    .btn-gray { background-color: #555; }
+    .btn-gray:hover { background-color: #444; }
 
-    .btn-green { background: var(--success); color: #fff; padding: 10px 16px; width: 100%; margin-top: 8px; }
-    .btn-green:hover { background: #16a34a; }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 16px;
+    .sm-btn {
+      width: auto;
+      padding: 5px 10px;
+      font-size: 12px;
     }
-    .btn-outline:hover { background: var(--card); }
 
-    /* Layout & Cards */
+    /* Overlays and Panels */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 50px;
+      overflow-y: auto;
+    }
+
+    .panel {
+      background-color: #1e1e1e;
+      border: 1px solid #444;
+      padding: 30px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 50px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      border-bottom: 1px solid #444;
+      padding-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .section-label {
+      font-size: 14px;
+      font-weight: bold;
+      color: #aaa;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    /* Navigation and Layout */
     .top-nav {
-      padding: 16px 24px;
-      display: flex;
-      justify-content: flex-end;
-      border-bottom: 1px solid var(--border);
-      background: var(--card);
-      z-index: 10;
+      background-color: #1e1e1e;
+      border-bottom: 1px solid #333;
+      padding: 10px 20px;
+      text-align: right;
     }
 
     .main-wrap {
       flex-grow: 1;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      padding: 20px;
+      justify-content: center;
     }
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+    .brand-logo {
+      max-width: 250px;
+      margin-bottom: 30px;
+    }
+
+    .tool-menu {
+      background-color: #1e1e1e;
+      border: 1px solid #333;
       padding: 40px;
+      width: 300px;
+      text-align: center;
+    }
+
+    /* Logs and Results */
+    .log-table {
       width: 100%;
-      max-width: 440px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .log-table th, .log-table td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: left;
+    }
+    .log-table th { background-color: #2a2a2a; }
+
+    .result-box {
+      background-color: #111;
+      border: 1px solid #555;
+      padding: 15px;
+      font-family: monospace;
+      color: #4caf50;
+      word-break: break-all;
+      margin-top: 10px;
     }
 
-    .brand-logo { max-width: 160px; border-radius: 12px; margin-bottom: 24px; display: block; margin-left: auto; margin-right: auto; }
-    .title { margin: 0 0 8px 0; font-size: 20px; font-weight: 600; }
-    .subtitle { color: var(--muted); margin: 0 0 24px 0; font-size: 14px; }
-    .section-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
-
-    /* Admin Overlays */
-    #admin-menu-overlay, #lock-screen {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
+    /* Fullscreen Modal */
+    #sys-modal { padding-top: 0; }
+    .modal-head {
+      background-color: #222;
+      padding: 10px 20px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      padding: 20px;
+      border-bottom: 1px solid #444;
+      width: 100%;
+      box-sizing: border-box;
     }
-
-    .admin-card {
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 32px;
+    #app-frame {
+      width: 100%;
+      height: calc(100vh - 50px);
+      border: none;
+      background-color: #fff;
     }
-
-    .admin-section {
-      border-top: 1px solid var(--border);
-      margin-top: 24px;
-      padding-top: 24px;
-    }
-
-    .log-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
-    .log-table th, .log-table td { border-bottom: 1px solid var(--border); padding: 10px; text-align: left; }
-    .log-table th { color: var(--muted); font-weight: 500; }
-    .sm-btn { padding: 6px 12px; font-size: 11px; border-radius: 6px; }
-
-    .result-box { background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-top: 12px; font-size: 13px; word-break: break-all; color: var(--success); }
-
-    /* Modal */
-    .modal-wrapper { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 9999; flex-flow: column nowrap; }
-    .modal-head { background: var(--card); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-    .head-actions { display: flex; gap: 12px; }
-    #app-frame { flex-grow: 1; border: none; background: #fff; }
   </style>
 </head>
 <body>
 
-  <div id="lock-screen" style="display: none;">
-    <div class="card">
-      <h2 class="title">Admin Login</h2>
-      <p class="subtitle">Enter credentials to access the control panel.</p>
-      <input type="email" id="adm-email" placeholder="Email Address">
-      <input type="password" id="adm-pass" placeholder="Password">
-      <button class="btn-main" style="margin-top:16px;" onclick="loginAdmin()">Sign In</button>
-      <div id="admin-login-error" style="color:var(--danger); font-size:13px; margin-top:12px; text-align:center;"></div>
-      <div style="text-align:center; margin-top:16px;">
-        <span style="color:var(--muted); font-size:13px; cursor:pointer;" onclick="closeAdminLogin()">Cancel</span>
-      </div>
-    </div>
-  </div>
-
-  <div id="admin-menu-overlay" style="display: none;">
-    <div class="card admin-card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <h2 class="title" style="margin:0;">Dashboard</h2>
-        <button class="btn-outline sm-btn" onclick="logoutAdmin()">Close</button>
-      </div>
-
-      <div class="admin-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <span class="section-label" style="margin:0;">Live Visitors</span>
-          <button class="btn-outline sm-btn" onclick="refreshVisitorLog()">Refresh</button>
-        </div>
-        <table class="log-table">
-          <thead><tr><th>Identity / Email</th><th>IP Address</th><th>Actions</th></tr></thead>
-          <tbody id="visitor-log-rows">
-            <tr><td colspan="3" style="text-align:center; color:var(--muted);">No recent visitors.</td></tr>
-          </tbody>
-        </table>
-      </div>
-      
-      <div class="admin-section">
-        <span class="section-label">Manual Access Control</span>
-        <div style="display:flex; gap:12px;">
-          <div style="flex:1;">
-            <input type="text" id="ban-user-email" placeholder="Email, IP, or Device ID">
-            <button class="btn-red" onclick="executeBan(true)">Ban Target</button>
-          </div>
-          <div style="flex:1;">
-            <input type="text" id="unban-user-email" placeholder="Email, IP, or Device ID">
-            <button class="btn-green" onclick="executeBan(false)">Unban Target</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="admin-section">
-        <span class="section-label">Identity Link Generator</span>
-        <input type="email" id="target-user-email" placeholder="User Email Address">
-        <button class="btn-blue" onclick="generateUserLink()">Create Link</button>
-        <div id="link-result" class="result-box" style="display:none;"></div>
-      </div>
-
-      <div class="admin-section">
-        <span class="section-label">System Admins</span>
-        <input type="email" id="new-admin-email" placeholder="New Admin Email">
-        <button class="btn-main" onclick="addNewAdmin()">Add Admin</button>
-        <div id="admin-result" class="result-box" style="display:none; color:var(--primary);"></div>
-      </div>
-    </div>
-  </div>
-
   <div class="top-nav">
-    <button class="btn-outline" onclick="openAdminPanelDirectly()">Admin Panel</button>
+    <button class="btn-gray sm-btn" onclick="openAdminPanelDirectly()">Admin Portal</button>
   </div>
 
   <div class="main-wrap">
-    <div class="card">
-      <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png?ex=6a1492ff&is=6a13417f&hm=f4a9b4310ce48c88fe8b0a727ee691107e857ddd02e743ded396e53e448b5e8c&=&format=webp&quality=lossless&width=362&height=242" alt="Logo" class="brand-logo">
-      <div style="display:flex; flex-direction:column; gap:12px;">
-        <button class="btn-main" onclick="launchApp('html')">Open HTML Editor</button>
-        <button class="btn-main" onclick="launchApp('apk')">Open APK Editor</button>
+    <img src="https://media.discordapp.net/attachments/1463304807149473946/1507810543010975754/image.png?ex=6a1492ff&is=6a13417f&hm=f4a9b4310ce48c88fe8b0a727ee691107e857ddd02e743ded396e53e448b5e8c&=&format=webp&quality=lossless" alt="GUI Logo" class="brand-logo">
+    <div class="tool-menu">
+      <button class="btn-blue" style="margin-bottom: 15px;" onclick="launchApp('html')">Open HTML Editor</button>
+      <button class="btn-blue" onclick="launchApp('apk')">Open APK Editor</button>
+    </div>
+  </div>
+
+  <div id="lock-screen" class="overlay">
+    <div class="panel" style="max-width: 400px;">
+      <h2>Admin Login</h2>
+      <input type="email" id="adm-email" placeholder="Email Address">
+      <input type="password" id="adm-pass" placeholder="Password">
+      <button class="btn-blue" onclick="loginAdmin()">Login</button>
+      <div id="admin-login-error" style="color: #dc3545; font-size: 13px; margin-top: 10px; text-align: center;"></div>
+      <div style="text-align: center; margin-top: 15px;">
+        <span style="color: #888; font-size: 12px; cursor: pointer;" onclick="closeAdminLogin()">Cancel</span>
       </div>
     </div>
   </div>
 
-  <div class="modal-wrapper" id="sys-modal">
+  <div id="admin-menu-overlay" class="overlay">
+    <div class="panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0; border: none; padding: 0;">Control Panel</h2>
+        <button class="btn-gray sm-btn" onclick="logoutAdmin()">Logout</button>
+      </div>
+
+      <span class="section-label">Live Game Site Visitors</span>
+      <button class="btn-gray sm-btn" style="margin-bottom: 10px;" onclick="refreshVisitorLog()">Refresh Logs</button>
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Identity / Email</th>
+            <th>IP Address</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="visitor-log-rows">
+          <tr><td colspan="3" style="text-align:center; color:#888;">No recent visitors found.</td></tr>
+        </tbody>
+      </table>
+      
+      <span class="section-label">Manual Ban Control</span>
+      <div style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+          <input type="text" id="ban-user-email" placeholder="Enter Identity, IP, or Email to Ban">
+          <button class="btn-red" onclick="executeBan(true)">Ban Target</button>
+        </div>
+        <div style="flex: 1;">
+          <input type="text" id="unban-user-email" placeholder="Enter Target to Unban">
+          <button class="btn-green" onclick="executeBan(false)">Unban Target</button>
+        </div>
+      </div>
+
+      <span class="section-label">Identity Token Link Generator</span>
+      <input type="email" id="target-user-email" placeholder="User's Email Address">
+      <button class="btn-blue" onclick="generateUserLink()">Generate Identity Link</button>
+      <div id="link-result" class="result-box" style="display:none;"></div>
+
+      <span class="section-label">Authorize New Admin</span>
+      <input type="email" id="new-admin-email" placeholder="New Admin Email Address">
+      <button class="btn-gray" onclick="addNewAdmin()">Create Admin</button>
+      <div id="admin-result" class="result-box" style="display:none;"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="sys-modal" style="flex-direction: column; padding: 0;">
     <div class="modal-head">
-      <h2 class="title" id="m-title" style="margin:0;">Workspace</h2>
-      <div class="head-actions">
-        <button class="btn-outline" onclick="toggleFS()">Fullscreen</button>
-        <button class="btn-red" style="margin:0; width:auto; padding:8px 16px;" onclick="closeApp()">Close</button>
+      <h2 id="m-title" style="margin: 0; font-size: 16px; border: none;">Workspace</h2>
+      <div>
+        <button class="btn-gray sm-btn" onclick="toggleFS()">Fullscreen</button>
+        <button class="btn-red sm-btn" onclick="closeApp()">Close</button>
       </div>
     </div>
     <iframe id="app-frame"></iframe>
@@ -286,7 +291,12 @@
     }
 
     function closeAdminLogin() { $('lock-screen').style.display = 'none'; }
-    function logoutAdmin() { $('admin-menu-overlay').style.display = 'none'; cachedAdminEmail = ""; cachedAdminSecret = ""; }
+    
+    function logoutAdmin() {
+      $('admin-menu-overlay').style.display = 'none';
+      cachedAdminEmail = "";
+      cachedAdminSecret = "";
+    }
 
     async function refreshVisitorLog() {
       try {
@@ -300,7 +310,7 @@
           const tbody = $('visitor-log-rows');
           tbody.innerHTML = "";
           if (data.visitors.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--muted);">No recent visitors found.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">No recent visitors found.</td></tr>`;
             return;
           }
           data.visitors.forEach(v => {
@@ -310,8 +320,8 @@
               <td>${identityDisplay}</td>
               <td>${v.ip}</td>
               <td>
-                <button class="btn-red sm-btn" style="margin:0;" onclick="quickBan('${v.deviceId}')">Ban ID</button>
-                <button class="btn-red sm-btn" style="margin:0 0 0 4px;" onclick="quickBan('${v.ip}')">Ban IP</button>
+                <button class="btn-red sm-btn" onclick="quickBan('${v.deviceId}')">Ban ID</button>
+                <button class="btn-red sm-btn" onclick="quickBan('${v.ip}')">Ban IP</button>
               </td>
             `;
             tbody.appendChild(tr);
@@ -329,6 +339,11 @@
         });
         const data = await response.json();
         if (response.ok && data.success) {
+          if (data.linked) {
+            alert(`Targeted matching device and IP addresses blacklisted.`);
+          } else {
+            alert(`MANUAL TARGET APPLIED: ${target} added to database.`);
+          }
           refreshVisitorLog();
         }
       } catch(e){}
@@ -338,6 +353,7 @@
       const targetEmail = $('target-user-email').value;
       const resBox = $('link-result');
       resBox.style.display = "none";
+
       try {
         const response = await fetch(`${SERVER_URL}/admin/generate`, {
           method: 'POST',
@@ -345,35 +361,53 @@
           body: JSON.stringify({ adminEmail: cachedAdminEmail, secret: cachedAdminSecret, targetEmail: targetEmail })
         });
         const data = await response.json();
+
         if (response.ok && data.success) {
           const gameSiteBaseUrl = window.location.href.replace('imgui-tools.html', 'index.html').split('?')[0];
           resBox.innerText = `${gameSiteBaseUrl}?code=${data.code}`;
           resBox.style.display = "block";
+        } else {
+          alert(data.error || "Failed to generate link.");
         }
-      } catch (err) {}
+      } catch (err) {
+        alert("Server communication error.");
+      }
     }
 
     async function executeBan(shouldBan) {
       const targetInput = shouldBan ? $('ban-user-email') : $('unban-user-email');
       const endpoint = shouldBan ? 'ban' : 'unban';
-      if (!targetInput.value) return;
+      if (!targetInput.value) return alert("Please specify a target value.");
+
       try {
         const response = await fetch(`${SERVER_URL}/admin/${endpoint}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ adminEmail: cachedAdminEmail, secret: cachedAdminSecret, [shouldBan ? 'banEmail' : 'unbanEmail']: targetInput.value })
         });
-        if (response.ok) {
+        const data = await response.json();
+        if (response.ok && data.success) {
+          if (shouldBan && data.linked) {
+             alert(`SUCCESS: Target session identified. Matching Device ID and IP address fully blacklisted.`);
+          } else {
+             alert(`Operation successful for: ${targetInput.value}`);
+          }
           targetInput.value = "";
           refreshVisitorLog();
+        } else {
+          alert(data.error || "Operation failed.");
         }
-      } catch (e) {}
+      } catch (e) {
+        alert("Server communication error.");
+      }
     }
 
     async function addNewAdmin() {
       const newAdminEmail = $('new-admin-email').value;
       const resDiv = $('admin-result');
       resDiv.style.display = "none";
+      resDiv.innerText = "";
+
       try {
         const response = await fetch(`${SERVER_URL}/admin/add`, {
           method: 'POST',
@@ -381,17 +415,25 @@
           body: JSON.stringify({ adminEmail: cachedAdminEmail, secret: cachedAdminSecret, newAdminEmail: newAdminEmail })
         });
         const data = await response.json();
+
         if (response.ok && data.success) {
-          resDiv.innerHTML = `Created!<br>Email: ${newAdminEmail}<br>Password: <strong>${data.password}</strong>`;
+          resDiv.innerHTML = `Admin account created!<br>Email: ${newAdminEmail}<br>Generated Password: <strong>${data.password}</strong>`;
           resDiv.style.display = "block";
           $('new-admin-email').value = "";
+        } else {
+          alert(data.error || 'Failed to add admin.');
         }
-      } catch (err) {}
+      } catch (err) {
+        alert("Server communication error.");
+      }
     }
+
+    const tplHTML = `<!DOCTYPE html><html><body style="background:#fff;color:#000;font-family:sans-serif;padding:20px;"><h2>HTML Editor Environment</h2></body></html>`;
+    const tplAPK = `<!DOCTYPE html><html><body style="background:#fff;color:#000;font-family:sans-serif;padding:20px;"><h2>APK Editor Environment</h2></body></html>`;
 
     function launchApp(type) {
       $('m-title').innerText = type === 'html' ? "HTML Editor" : "APK Opener";
-      $('app-frame').srcdoc = `<!DOCTYPE html><html><body style="background:#111;color:#fff;font-family:sans-serif;padding:20px;"><h2>${type.toUpperCase()} Editor Loading...</h2></body></html>`;
+      $('app-frame').srcdoc = type === 'html' ? tplHTML : tplAPK;
       $('sys-modal').style.display = 'flex';
     }
 
