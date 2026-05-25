@@ -257,20 +257,14 @@
 </head>
 <body>
 
-  <div id="lock-screen">
-    <div class="lock-box" id="mode-user">
-      <h2 class="lock-title">Access Restricted</h2>
-      <div id="status-message" class="status-msg">Verifying 1-time authorization token...</div>
-      <div class="switch-lnk" onclick="switchMode('admin')">Access Admin Portal</div>
-    </div>
-
-    <div class="lock-box" id="mode-admin" style="display:none;">
+  <div id="lock-screen" style="display: none;">
+    <div class="lock-box" id="mode-admin">
       <h2 class="lock-title">Admin Portal</h2>
       <input type="email" id="adm-email" class="admin-input" placeholder="Your Admin Email">
       <input type="password" id="adm-pass" class="admin-input" placeholder="Master Password">
       <button class="admin-btn" onclick="loginAdmin()">Login to Dashboard</button>
       <div id="admin-login-error" style="color:#ef4444; font-size:13px; margin-top:10px;"></div>
-      <div class="switch-lnk" onclick="switchMode('user')">Back to Validation Screen</div>
+      <div class="switch-lnk" onclick="closeAdminLogin()">Cancel</div>
     </div>
   </div>
 
@@ -282,7 +276,7 @@
       </div>
       
       <div class="adm-section">
-        <label class="adm-lbl">Generate Single-Use Link</label>
+        <label class="adm-lbl">Generate Single-Use Link (For Games Site)</label>
         <input type="email" id="target-user-email" class="admin-input" placeholder="User's Email Address">
         <button class="admin-btn" style="background:#3b82f6;" onclick="generateUserLink()">Generate Access Link</button>
         <div id="link-result" class="result-box" style="display:none;"></div>
@@ -340,70 +334,6 @@
     let cachedAdminEmail = "";
     let cachedAdminSecret = "";
 
-    window.addEventListener('DOMContentLoaded', async () => {
-      const storedEmail = localStorage.getItem('imgui_user_email');
-      if (storedEmail) {
-        try {
-          const checkRes = await fetch('http://localhost:3000/check-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: storedEmail })
-          });
-          const statusData = await checkRes.json();
-          if (statusData.banned) {
-            localStorage.removeItem('imgui_user_email');
-            $('status-message').innerHTML = "<span style='color:#ef4444;'>Your permanent access has been revoked/banned.</span>";
-            return;
-          }
-          $('lock-screen').style.display = 'none';
-          return;
-        } catch (e) {
-          $('lock-screen').style.display = 'none';
-          return;
-        }
-      }
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      const statusText = $('status-message');
-
-      if (!code) {
-        statusText.innerHTML = "<span style='color:#ef4444;'>Error: No access code detected.<br>You must use an official single-use generation link.</span>";
-        return;
-      }
-
-      try {
-        const response = await fetch('http://localhost:3000/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code: code })
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          statusText.innerHTML = `<span style='color:#22c55e;'>Access Granted!<br>Welcome, ${data.email}</span>`;
-          localStorage.setItem('imgui_user_email', data.email);
-          window.history.replaceState({}, document.title, window.location.pathname);
-          setTimeout(() => { $('lock-screen').style.display = 'none'; }, 1200);
-        } else {
-          statusText.innerHTML = `<span style='color:#ef4444;'>Access Denied:<br>${data.error || 'Invalid Link Code'}</span>`;
-        }
-      } catch (err) {
-        statusText.innerHTML = "<span style='color:#ef4444;'>Error connecting to validation servers. Please try again later.</span>";
-      }
-    });
-
-    function switchMode(mode) {
-      if (mode === 'admin') {
-        $('mode-user').style.display = 'none';
-        $('mode-admin').style.display = 'block';
-      } else {
-        $('mode-admin').style.display = 'none';
-        $('mode-user').style.display = 'block';
-      }
-    }
-
     async function loginAdmin() {
       const email = $('adm-email').value;
       const secret = $('adm-pass').value;
@@ -436,16 +366,17 @@
         $('admin-menu-overlay').style.display = 'flex';
       } else {
         $('lock-screen').style.display = 'flex';
-        switchMode('admin');
       }
+    }
+
+    function closeAdminLogin() {
+      $('lock-screen').style.display = 'none';
     }
 
     function logoutAdmin() {
       $('admin-menu-overlay').style.display = 'none';
-      if (!localStorage.getItem('imgui_user_email')) {
-        $('lock-screen').style.display = 'flex';
-        switchMode('user');
-      }
+      cachedAdminEmail = "";
+      cachedAdminSecret = "";
     }
 
     async function generateUserLink() {
@@ -466,7 +397,8 @@
         const data = await response.json();
 
         if (response.ok && data.success) {
-          const generatedLink = `${window.location.origin}${window.location.pathname}?code=${data.code}`;
+          const gameSiteBaseUrl = window.location.href.replace('imgui-tools.html', 'index.html').split('?')[0];
+          const generatedLink = `${gameSiteBaseUrl}?code=${data.code}`;
           resBox.innerText = generatedLink;
           resBox.style.display = "block";
         } else {
