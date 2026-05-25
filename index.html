@@ -355,10 +355,10 @@
             $('status-message').innerHTML = "<span style='color:#ef4444;'>Your permanent access has been revoked/banned.</span>";
             return;
           }
-          $('lock-screen').remove();
+          $('lock-screen').style.display = 'none';
           return;
         } catch (e) {
-          $('lock-screen').remove();
+          $('lock-screen').style.display = 'none';
           return;
         }
       }
@@ -385,7 +385,7 @@
           statusText.innerHTML = `<span style='color:#22c55e;'>Access Granted!<br>Welcome, ${data.email}</span>`;
           localStorage.setItem('imgui_user_email', data.email);
           window.history.replaceState({}, document.title, window.location.pathname);
-          setTimeout(() => { $('lock-screen').remove(); }, 1200);
+          setTimeout(() => { $('lock-screen').style.display = 'none'; }, 1200);
         } else {
           statusText.innerHTML = `<span style='color:#ef4444;'>Access Denied:<br>${data.error || 'Invalid Link Code'}</span>`;
         }
@@ -435,7 +435,6 @@
       if (cachedAdminEmail && cachedAdminSecret) {
         $('admin-menu-overlay').style.display = 'flex';
       } else {
-        document.body.appendChild($('lock-screen'));
         $('lock-screen').style.display = 'flex';
         switchMode('admin');
       }
